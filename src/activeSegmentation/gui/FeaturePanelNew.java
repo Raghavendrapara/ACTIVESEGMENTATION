@@ -1,3 +1,4 @@
+
 package activeSegmentation.gui;
 
 
@@ -49,7 +50,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import activeSegmentation.ASCommon;
- 
+import activeSegmentation.EventType;
 import activeSegmentation.LearningType;
 import activeSegmentation.ProjectType;
 import activeSegmentation.feature.FeatureManager;
@@ -120,6 +121,7 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 	private List<JCheckBox> jCheckBoxList;
 	private Map<String,JTextArea> jTextList;
 	private JComboBox<LearningType> learningType;
+	private JComboBox<EventType> eventType;
 	private JFrame frame;
 
 	/*
@@ -141,7 +143,7 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 
 
 	public void showPanel() {
-		frame = new JFrame("Marking");	     
+		frame = new JFrame("Train");	     
 		
 		frame.setResizable(false);
  		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -177,13 +179,13 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		 * class panel
 		 */
 	 	
-		classPanel.setBounds(605,20,350,100);
+		classPanel.setBounds(785,20,350,100);
 		classPanel.setPreferredSize(new Dimension(350, 100));
 		classPanel.setBorder(BorderFactory.createTitledBorder("Classes"));
 		
 		JScrollPane classScrolPanel = new JScrollPane(classPanel);
 		classScrolPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		classScrolPanel.setBounds(605,20,350,80);
+		classScrolPanel.setBounds(785,20,350,80);
 		addClassPanel();
 		panel.add(classScrolPanel);
 		
@@ -192,22 +194,22 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		 * features
 		 */
 		JPanel features= new JPanel();
-		features.setBounds(605,120,350,100);
-		features.setBorder(BorderFactory.createTitledBorder("Learning"));
+		features.setBounds(785,120,350,100);
+		features.setBorder(BorderFactory.createTitledBorder("Move Frame"));
 		
-		addButton(new JButton(), "PREVIOUS",null , 610, 130, 120, 20,features,PREVIOUS_BUTTON_PRESSED,null );
+		addButton(new JButton(), "PREVIOUS",null , 795, 130, 120, 20,features,PREVIOUS_BUTTON_PRESSED,null );
 		
 		imageNum= new JTextField();
 		imageNum.setColumns(5);
-		imageNum.setBounds( 630, 130, 10, 20 );
+		imageNum.setBounds( 800, 130, 10, 20 );
 		JLabel dasedLine= new JLabel("/");
 		dasedLine.setFont(new Font( "Arial", Font.PLAIN, 15 ));
 		dasedLine.setForeground(Color.BLACK);
-		dasedLine.setBounds(  670, 130, 10, 20 );
+		dasedLine.setBounds(  820, 130, 10, 20 );
 		total= new JLabel("Total");
 		total.setFont(new Font( "Arial", Font.PLAIN, 15 ));
 		total.setForeground(Color.BLACK);
-		total.setBounds( 500, 600, 80, 30);		
+		total.setBounds( 800, 600, 80, 30);		
 		imageNum.setText(Integer.toString(featureManager.getCurrentSlice()));
 		total.setText(Integer.toString(featureManager.getTotalSlice()));
 		features.add(imageNum);
@@ -220,11 +222,11 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		
 		JPanel computePanel = new JPanel();
 		addButton(new JButton(), "Next",null , 800, 130, 80, 20,features,NEXT_BUTTON_PRESSED,null );
-		addButton(new JButton(), "Train",null, 550,550,350,100,computePanel, COMPUTE_BUTTON_PRESSED,null);
+	/*	addButton(new JButton(), "Train",null, 550,550,350,100,computePanel, COMPUTE_BUTTON_PRESSED,null);
 		addButton(new JButton(), "Save",null, 550,550,350,100,computePanel, SAVE_BUTTON_PRESSED,null);
 		addButton(new JButton(), "Overlay",null, 550,550,350,100,computePanel, TOGGLE_BUTTON_PRESSED,null);
 		addButton(new JButton(), "Masks",null, 550,550,350,100,computePanel, MASKS_BUTTON_PRESSED,null);
-		
+	*/	
 		features.add(computePanel);
 		frame.add(features);
 		
@@ -233,9 +235,9 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		 */
 		
 		JPanel dataJPanel = new JPanel();
-		learningType = new JComboBox<LearningType>(LearningType.values());
-		learningType.setVisible(true);
-		learningType.addItemListener( new ItemListener() {
+		eventType = new JComboBox<EventType>(EventType.values());
+		eventType.setVisible(true);
+		eventType.addItemListener( new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -253,12 +255,12 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 			}
 		});
 		
-		dataJPanel.setBounds(720,240,100,60);
-		learningType.setSelectedIndex(0);
-		learningType.setFont( panelFONT );
-		learningType.setBackground(Color.GRAY);
-		learningType.setForeground(Color.WHITE);
-		dataJPanel.add(learningType);
+		dataJPanel.setBounds(820,240,100,60);
+		eventType.setSelectedIndex(0);
+		eventType.setFont( panelFONT );
+		eventType.setBackground(Color.GRAY);
+		eventType.setForeground(Color.WHITE);
+		dataJPanel.add(eventType);
 		dataJPanel.setBackground(Color.GRAY);
 		
 		panel.add(dataJPanel);
@@ -270,7 +272,7 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		//roiPanel.setPreferredSize(new Dimension(350, 400));
 		JScrollPane scrollPane = new JScrollPane(roiPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
-		scrollPane.setBounds(605,300,350,250);
+		scrollPane.setBounds(805,300,350,250);
 		panel.add(scrollPane);
 		frame.add(panel);
 		
