@@ -268,13 +268,13 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		/*
 		 * ROI panel
 		 */
-		roiPanel.setBorder(BorderFactory.createTitledBorder("Regions Of Interest"));
+	/*	roiPanel.setBorder(BorderFactory.createTitledBorder("Regions Of Interest"));
 		//roiPanel.setPreferredSize(new Dimension(350, 400));
 		JScrollPane scrollPane = new JScrollPane(roiPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
 		scrollPane.setBounds(805,300,350,250);
 		panel.add(scrollPane);
-		frame.add(panel);
+	*/	frame.add(panel);
 		
 		/*
 		 *  frame code

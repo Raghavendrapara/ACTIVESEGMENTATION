@@ -1,7 +1,5 @@
 package activeSegmentation;
 
-
-
 public enum EventType {
 
 	EVENT_TRUE (1),  
