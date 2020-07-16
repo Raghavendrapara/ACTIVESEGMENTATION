@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="C:/Applications/ImageJ/plugins/pixlib-1-0.jar"/>
 	<classpathentry kind="lib" path="C:/Applications/ImageJ/plugins/dsplib-1-0.jar"/>
 	<classpathentry kind="lib" path="C:/Applications/ImageJ/plugins/fftscale-1-0.jar"/>
-	<classpathentry kind="lib" path="jars/ACTIVE_SEG.jar"/>
 	<classpathentry kind="lib" path="jars/Auto_Threshold.jar"/>
 	<classpathentry kind="lib" path="jars/BeanShell.jar"/>
 	<classpathentry kind="lib" path="jars/dsplib-1-0.jar"/>
