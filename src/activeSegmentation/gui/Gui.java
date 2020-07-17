@@ -37,7 +37,7 @@ public class Gui implements ASCommon {
 	final ActionEvent LEARNING_BUTTON_PRESSED = new ActionEvent(this, 2, "Learning");
 	final ActionEvent EVALUATION_BUTTON_PRESSED = new ActionEvent(this, 3, "Evaluation");
 	final ActionEvent FILTERVIS_BUTTON_PRESSED = new ActionEvent(this, 4, "FilterVis");
-	final ActionEvent TRAINING_BUTTON_PRESSED = new ActionEvent(this, 5, "Feature");
+	final ActionEvent TRAINING_BUTTON_PRESSED = new ActionEvent(this, 5, "Tracking");
 
 	
 	private FeatureManager featureManager;
@@ -71,7 +71,7 @@ public class Gui implements ASCommon {
 			}
 		if ((event == this.TRAINING_BUTTON_PRESSED)) {
 			if (this.featurePanel == null) {
-				new FeaturePanelNew(featureManager);
+				new TrainingPanelTracking(featureManager);
 			}	
 		}
 		
@@ -111,10 +111,12 @@ public class Gui implements ASCommon {
 		label.setBounds(100, 50, 450, 100);
 		label.setForeground(Color.ORANGE);
 		this.controlPanel.add(label);
-		this.controlPanel.add(addButton("Training", null, 25, 150, 200, 50, this.TRAINING_BUTTON_PRESSED));
-		this.controlPanel.add(addButton("Features", null, 275, 150, 200, 50, this.FEATURE_BUTTON_PRESSED));
-	//	this.controlPanel.add(addButton("Feature Extraction", null, 25, 250, 200, 50, this.FEATURE_BUTTON_PRESSED));
-	//	this.controlPanel.add(addButton("Model Learning", null, 275, 250, 200, 50, this.LEARNING_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Select Filters", null, 25, 150, 200, 50, this.FILTER_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Filter Visualization", null, 275, 150, 200, 50, this.FILTERVIS_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Feature Extraction", null, 25, 250, 200, 50, this.FEATURE_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Model Learning", null, 275, 250, 200, 50, this.LEARNING_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Cell Tracking ", null, 25, 350, 200, 50, this.TRAINING_BUTTON_PRESSED));
+		
 		//this.controlPanel.add(addButton("EVALUATION", null, 25, 350, 200, 50, this.EVALUATION_BUTTON_PRESSED));
 
 		this.controlPanel.setLocation(0, 0);
