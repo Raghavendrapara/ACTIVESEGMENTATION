@@ -17,6 +17,7 @@ import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -163,12 +164,13 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel = new JPanel();	
 		roiPanel= new JPanel();
 		classPanel= new JPanel();
+		nxt=new JPanel();
 		
 		/*
 		 * image panel
 		 */
 		imagePanel.setLayout(new BorderLayout());
-		
+		nxt.setLayout(new BorderLayout());
 	/*	ic=new SimpleCanvas(featureManager.getCurrentImage());
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 		loadImage(displayImage);
@@ -195,13 +197,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel.add(ic,BorderLayout.EAST);
 		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
 		panel.add(imagePanel);
-		nxtImage=featureManager.getNextImageTrack();
-		MyCanvas x1=new MyCanvas(nxtImage,400,400,10,700);
-		JFrame mm=new JFrame();
-		mm.setSize(700, 700);
-	    mm.add(x1);
-	    mm.setVisible(true);
-        
+		
+		nxtImage=featureManager.getCurrentImage();
+		
+		Image imag=nxtImage.getImage();
+		imag=imag.getScaledInstance(400, 400, Image.SCALE_SMOOTH);
+		nxtImage=new ImagePlus("12",imag);
+		ImageCanvas x1=new ImageCanvas(nxtImage);
+		nxt=new JPanel();
+	    nxt.add(x1);
+		nxt.setBounds(10, 700, 400, 400);
+		panel.add(nxt);
 		/*
 		prvImage=featureManager.getPreviousImageTrack();
 		ImageCanvas x2=new ImageCanvas(prvImage);
@@ -430,6 +436,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		updateImage(this.displayImage);
 	}
 
+	private void loadNextImage(ImagePlus image){
+		this.nxtImage=image;
+		setImage(this.nxtImage);
+		updateImage(this.nxtImage);
+	}
+	
 	public void validateFrame(){
 		frame.invalidate();
 		frame.revalidate();

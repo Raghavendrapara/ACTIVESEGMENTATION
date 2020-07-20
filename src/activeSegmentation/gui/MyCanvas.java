@@ -18,7 +18,7 @@ public class MyCanvas extends ImageCanvas  {
 	 * 
 	 */
 	
-   
+   ImagePlus img;
     int length;int width;int xpos;int ypos;
    
 	MyCanvas(ImagePlus img,int length,int width,int xpos,int ypos)
@@ -40,7 +40,7 @@ public class MyCanvas extends ImageCanvas  {
 		//ImageCanvas icc=next.getCanvas();
         Image i=next.getImage();
 		i=i.getScaledInstance(length, width, Image.SCALE_SMOOTH);
-		g.drawImage(i,000,000,this);
+		g.drawImage(i,20,720,this);
 	}
 
 }
