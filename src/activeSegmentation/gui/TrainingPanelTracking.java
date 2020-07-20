@@ -198,27 +198,27 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
 		panel.add(imagePanel);
 		
-		nxtImage=featureManager.getCurrentImage();
+		nxtImage=featureManager.getNextImageTrack();
 		
 		Image imag=nxtImage.getImage();
-		imag=imag.getScaledInstance(400, 400, Image.SCALE_SMOOTH);
-		nxtImage=new ImagePlus("12",imag);
-		ImageCanvas x1=new ImageCanvas(nxtImage);
+		imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+		nxtImage=new ImagePlus("Next",imag);
+		ImageCanvas temp=new ImageCanvas(nxtImage);
 		nxt=new JPanel();
-	    nxt.add(x1);
-		nxt.setBounds(10, 700, 400, 400);
+	    nxt.add(temp);
+		nxt.setBounds(10, 700, 300, 300);
+		panel.add(nxt); 
+		
+        prvImage=featureManager.getPreviousImageTrack();
+		
+		imag=nxtImage.getImage();
+		imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+		nxtImage=new ImagePlus("Prev",imag);
+		temp=new ImageCanvas(nxtImage);
+		nxt=new JPanel();
+	    nxt.add(temp);
+		nxt.setBounds(350, 700, 300, 300);
 		panel.add(nxt);
-		/*
-		prvImage=featureManager.getPreviousImageTrack();
-		ImageCanvas x2=new ImageCanvas(prvImage);
-	    prv=new JPanel();
-		prv.add(x2);
-		prv.setBounds(510, 700, 400, 400);
-		panel.add(prv);
-		*/
-		/*
-		 * class panel
-		 */
 	 	
 		classPanel.setBounds(785,20,350,100);
 		classPanel.setPreferredSize(new Dimension(350, 100));
