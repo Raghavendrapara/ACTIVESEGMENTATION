@@ -436,11 +436,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		updateImage(this.displayImage);
 	}
 
-	private void loadNextImage(ImagePlus image){
-		this.nxtImage=image;
-		setImage(this.nxtImage);
-		updateImage(this.nxtImage);
-	}
+	
 	
 	public void validateFrame(){
 		frame.invalidate();
@@ -723,20 +719,28 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			//updateallExampleLists();
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 			ic.repaint();
-			/*JPanel panel=new JPanel();
+			
+			nxt=new JPanel();
 			nxtImage=featureManager.getNextImageTrack();
-			ImageCanvas x1=new ImageCanvas(nxtImage);
-		    nxt.add(x1);
-			nxt.setBounds(10, 700, 400, 400);
-			panel.add(nxt);
+			Image imag=nxtImage.getImage();
+			imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+			nxtImage=new ImagePlus("next",imag);
+			ImageCanvas temp=new ImageCanvas(nxtImage);
+		    nxt.add(temp);
+		    nxt.setBounds(10,700,300,300);
+			frame.add(nxt);
 
 			
+			prv=new JPanel();
 			prvImage=featureManager.getPreviousImageTrack();
-			ImageCanvas x2=new ImageCanvas(prvImage);
-		    prv.add(x2);
-			prv.setBounds(510, 700, 400, 400);
-			panel.add(prv);
-			frame.add(panel);*/
+			imag=prvImage.getImage();
+			imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+			prvImage=new ImagePlus("prev",imag);
+			temp=new ImageCanvas(prvImage);
+		    prv.add(temp);
+		    prv.setBounds(350,700,300,300);
+			frame.add(prv);	
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
