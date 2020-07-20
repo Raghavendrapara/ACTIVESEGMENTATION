@@ -30,6 +30,8 @@ public class Gui implements ASCommon {
 	private LearningPanel learningPanel;
 	private FilterPanel filterPanel;
 	private FeaturePanelNew featurePanel;
+	private TrainingPanelTracking trackingPanel;
+	private TrainingPanelTracking trainingPanel;
 	//private ViewFilterResults viewFilterResults;
 	
 	final ActionEvent FEATURE_BUTTON_PRESSED = new ActionEvent(this, 0, "Feature");
@@ -37,13 +39,14 @@ public class Gui implements ASCommon {
 	final ActionEvent LEARNING_BUTTON_PRESSED = new ActionEvent(this, 2, "Learning");
 	final ActionEvent EVALUATION_BUTTON_PRESSED = new ActionEvent(this, 3, "Evaluation");
 	final ActionEvent FILTERVIS_BUTTON_PRESSED = new ActionEvent(this, 4, "FilterVis");
-	final ActionEvent TRAINING_BUTTON_PRESSED = new ActionEvent(this, 5, "Tracking");
-
+	final ActionEvent CELLTRACKING_BUTTON_PRESSED = new ActionEvent(this, 5, "CellTracking");
+	final ActionEvent TRAINING_BUTTON_PRESSED = new ActionEvent(this, 6, "Training");
+	final ActionEvent TRACKING_BUTTON_PRESSED = new ActionEvent(this, 7, "Tracking");
 	
 	private FeatureManager featureManager;
 	private ClassifierManager learningManager;
 	private ProjectManager projectManager;
-	
+//	private TrackingManager trackingManager;
 
 
 	public Gui(ProjectManager projectManager)	{
@@ -69,9 +72,9 @@ public class Gui implements ASCommon {
 				new ViewFilterResults(this.projectManager,featureManager);
 
 			}
-		if ((event == this.TRAINING_BUTTON_PRESSED)) {
-			if (this.featurePanel == null) {
-				new TrainingPanelTracking(featureManager);
+		if ((event == this.CELLTRACKING_BUTTON_PRESSED)) {
+			if (this.trackingPanel == null) {
+				prepareTracking();
 			}	
 		}
 		
@@ -91,6 +94,18 @@ public class Gui implements ASCommon {
 			IEvaluation evaluation = new EvaluationMetrics();
 			EvaluationPanel evaluationPanel = new EvaluationPanel(this.projectManager, evaluation);
 			SwingUtilities.invokeLater(evaluationPanel);
+		}
+		if ((event == this.TRAINING_BUTTON_PRESSED)) {
+			if (this.trainingPanel == null) {
+				new TrainingPanelTracking(featureManager);
+			}	
+		}
+			
+		if (event == this.TRACKING_BUTTON_PRESSED)	{
+			if (this.learningPanel == null) {
+				this.learningPanel = new LearningPanel(this.projectManager, this.learningManager);
+			}
+			SwingUtilities.invokeLater(this.learningPanel);
 		}
 	}
 	
@@ -115,8 +130,36 @@ public class Gui implements ASCommon {
 		this.controlPanel.add(addButton("Filter Visualization", null, 275, 150, 200, 50, this.FILTERVIS_BUTTON_PRESSED));
 		this.controlPanel.add(addButton("Feature Extraction", null, 25, 250, 200, 50, this.FEATURE_BUTTON_PRESSED));
 		this.controlPanel.add(addButton("Model Learning", null, 275, 250, 200, 50, this.LEARNING_BUTTON_PRESSED));
-		this.controlPanel.add(addButton("Cell Tracking ", null, 25, 350, 200, 50, this.TRAINING_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Cell Tracking ", null, 25, 350, 200, 50, this.CELLTRACKING_BUTTON_PRESSED));
 		
+		//this.controlPanel.add(addButton("EVALUATION", null, 25, 350, 200, 50, this.EVALUATION_BUTTON_PRESSED));
+
+		this.controlPanel.setLocation(0, 0);
+		this.mainFrame.add(this.controlPanel);
+		this.mainFrame.setVisible(true);
+	}
+
+	private void prepareTracking()	{
+		this.mainFrame = new JFrame("Cell Tracking");
+		this.mainFrame.getContentPane().setBackground(Color.LIGHT_GRAY);
+		this.mainFrame.setLocationRelativeTo(null);
+
+		this.mainFrame.setSize(frameWidth, frameHeight);
+
+		this.controlPanel = new JPanel();
+		this.controlPanel.setLayout(null);
+		this.controlPanel.setBackground(Color.GRAY);
+		JLabel label = new JLabel("Cell Tracking");
+		label.setFont(new Font("Arial", 1, 32));
+		label.setBounds(100, 50, 450, 100);
+		label.setForeground(Color.yellow);
+		this.controlPanel.add(label);
+		this.controlPanel.add(addButton("Start Training", null, 25, 150, 200, 50, this.TRAINING_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Tracking & Training", null, 275, 150, 200, 50, this.TRACKING_BUTTON_PRESSED));
+		/*this.controlPanel.add(addButton("", null, 25, 250, 200, 50, this.FEATURE_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Model Learning", null, 275, 250, 200, 50, this.LEARNING_BUTTON_PRESSED));
+		this.controlPanel.add(addButton("Cell Tracking ", null, 25, 350, 200, 50, this.TRACKING_BUTTON_PRESSED));
+		*/
 		//this.controlPanel.add(addButton("EVALUATION", null, 25, 350, 200, 50, this.EVALUATION_BUTTON_PRESSED));
 
 		this.controlPanel.setLocation(0, 0);

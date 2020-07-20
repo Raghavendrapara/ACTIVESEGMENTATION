@@ -196,20 +196,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
 		panel.add(imagePanel);
 		nxtImage=featureManager.getNextImageTrack();
-		ImageCanvas x1=new ImageCanvas(nxtImage);
-		nxt=new JPanel();
-	    nxt.add(x1);
-		nxt.setBounds(10, 700, 400, 400);
-		panel.add(nxt);
-
-		
+		MyCanvas x1=new MyCanvas(nxtImage,400,400,10,700);
+		JFrame mm=new JFrame();
+		mm.setSize(700, 700);
+	    mm.add(x1);
+	    mm.setVisible(true);
+        
+		/*
 		prvImage=featureManager.getPreviousImageTrack();
 		ImageCanvas x2=new ImageCanvas(prvImage);
 	    prv=new JPanel();
 		prv.add(x2);
 		prv.setBounds(510, 700, 400, 400);
 		panel.add(prv);
-		
+		*/
 		/*
 		 * class panel
 		 */
@@ -711,7 +711,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			//updateallExampleLists();
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 			ic.repaint();
-			JPanel panel=new JPanel();
+			/*JPanel panel=new JPanel();
 			nxtImage=featureManager.getNextImageTrack();
 			ImageCanvas x1=new ImageCanvas(nxtImage);
 		    nxt.add(x1);
@@ -724,7 +724,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		    prv.add(x2);
 			prv.setBounds(510, 700, 400, 400);
 			panel.add(prv);
-			frame.add(panel);
+			frame.add(panel);*/
 		}catch(Exception e){
 			e.printStackTrace();
 		}
