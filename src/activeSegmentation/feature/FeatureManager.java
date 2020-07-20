@@ -686,12 +686,27 @@ public class FeatureManager  {
 		//System.out.println("next slice"+sliceNum);
 		return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
+	public ImagePlus getNextImageTrack() {
+	
+		if(this.sliceNum < totalSlices) {
+		//System.out.println("next slice"+sliceNum);
+		return new ImagePlus(projectString + this.images.get(sliceNum));}
+		else
+			return new ImagePlus(projectString + this.images.get(sliceNum - 1)); 
+	}
 
 	public ImagePlus getPreviousImage() {
 		if (this.sliceNum > 1) {
 			this.sliceNum -= 1;
 		}
 		return new ImagePlus(projectString + this.images.get(sliceNum - 1));
+	}
+
+	public ImagePlus getPreviousImageTrack() {
+		if (this.sliceNum > 1) {
+		return new ImagePlus(projectString + this.images.get(sliceNum - 2));}
+		
+			return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
 
 	private ImagePlus createImageIcon(String path) {

@@ -101,7 +101,7 @@ public interface ASCommon {
 	public static int  frameHeight=450;
 	
 	public static int  largeframeWidth=1200;
-	public static int  largeframeHight=800;
+	public static int  largeframeHight=1000;
 	
 	public static final int IMAGE_CANVAS_DIMENSION = 700; //same width and height	
 	

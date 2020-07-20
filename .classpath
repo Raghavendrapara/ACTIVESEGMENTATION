@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="jars/weka.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/IJ"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/home/raghavendra/Downloads/ij153-linux64-java8/ImageJ/plugins/activeSegmentation/ACTIVE_SEG.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

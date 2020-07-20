@@ -2,6 +2,7 @@ package activeSegmentation.gui;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
 import ij.gui.Overlay;
 import ij.gui.Roi;
@@ -111,6 +112,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
  
 
 	private ImagePlus displayImage;
+	private ImagePlus prvImage;
+	private ImagePlus nxtImage;
 	/** Used only in classification setting, in segmentation we get from feature manager*/
 	//private ImagePlus tempClassifiedImage;
 	private JPanel imagePanel,classPanel,roiPanel;
@@ -121,7 +124,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private JComboBox<LearningType> learningType;
 	private JComboBox<EventType> eventType;
 	private JFrame frame;
-
+    private JPanel nxt;
+    private JPanel prv;
 	/*
 	 * constructor 
 	 */
@@ -138,6 +142,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		this.setVisible(false);
 		showPanel();
 	}
+
 
 
 	public void showPanel() {
@@ -164,7 +169,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		 */
 		imagePanel.setLayout(new BorderLayout());
 		
-		ic=new SimpleCanvas(featureManager.getCurrentImage());
+	/*	ic=new SimpleCanvas(featureManager.getCurrentImage());
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 		loadImage(displayImage);
 		setOverlay();
@@ -172,6 +177,38 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel.add(ic,BorderLayout.CENTER);
 		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
 		panel.add(imagePanel);
+		*/
+	/*	ic=new SimpleCanvas(featureManager.getCurrentImage());
+		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
+		loadImage(displayImage);
+		setOverlay();
+		imagePanel.setBackground(Color.GRAY);		
+		imagePanel.add(ic,BorderLayout.EAST);
+		imagePanel.setBounds( 10, 710, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
+		panel.add(imagePanel);
+*/
+		ic=new SimpleCanvas(featureManager.getCurrentImage());
+		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
+		loadImage(displayImage);
+		setOverlay();
+		imagePanel.setBackground(Color.GRAY);		
+		imagePanel.add(ic,BorderLayout.EAST);
+		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
+		panel.add(imagePanel);
+		nxtImage=featureManager.getNextImageTrack();
+		ImageCanvas x1=new ImageCanvas(nxtImage);
+		nxt=new JPanel();
+	    nxt.add(x1);
+		nxt.setBounds(10, 700, 400, 400);
+		panel.add(nxt);
+
+		
+		prvImage=featureManager.getPreviousImageTrack();
+		ImageCanvas x2=new ImageCanvas(prvImage);
+	    prv=new JPanel();
+		prv.add(x2);
+		prv.setBounds(510, 700, 400, 400);
+		panel.add(prv);
 		
 		/*
 		 * class panel
@@ -273,7 +310,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		scrollPane.setBounds(805,300,350,250);
 		panel.add(scrollPane);
 	*/	frame.add(panel);
-		
+
+	
 		/*
 		 *  frame code
 		 */
@@ -312,7 +350,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	/**
 	 * Draw the painted traces on the display image
 	 */
-	private void drawExamples(){
+/*	private void drawExamples(){
 		for(String key: featureManager.getClassKeys()){
 			ArrayList<Roi> rois=(ArrayList<Roi>) featureManager.
 					getExamples(key,learningType.getSelectedItem().toString(), featureManager.getCurrentSlice());
@@ -323,7 +361,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 		getImagePlus().updateAndDraw();
 	}
-	private void addSidePanel(Color color,String key,String label){
+*/	private void addSidePanel(Color color,String key,String label){
 		JPanel panel= new JPanel();
 		JList<String> current=GuiUtil.model();
 
@@ -668,17 +706,31 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	
 	private void updateGui(){
 		try{
-			drawExamples();
-			updateExampleLists();
+	//		drawExamples();
+	//		updateExampleLists();
 			//updateallExampleLists();
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 			ic.repaint();
+			JPanel panel=new JPanel();
+			nxtImage=featureManager.getNextImageTrack();
+			ImageCanvas x1=new ImageCanvas(nxtImage);
+		    nxt.add(x1);
+			nxt.setBounds(10, 700, 400, 400);
+			panel.add(nxt);
+
+			
+			prvImage=featureManager.getPreviousImageTrack();
+			ImageCanvas x2=new ImageCanvas(prvImage);
+		    prv.add(x2);
+			prv.setBounds(510, 700, 400, 400);
+			panel.add(prv);
+			frame.add(panel);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 
-	private void updateExampleLists()	{
+/*	private void updateExampleLists()	{
 		LearningType type=(LearningType) learningType.getSelectedItem();
 		for(String key:featureManager.getClassKeys()){
 			exampleList.get(key).removeAll();
@@ -692,7 +744,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			exampleList.get(key).setForeground(featureManager.getClassColor(key));
 		}
 	}	
-
+*/
 	private  MouseListener mouseListener = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
 			JList<?>  theList = ( JList<?>) mouseEvent.getSource();
