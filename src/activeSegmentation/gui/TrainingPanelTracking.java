@@ -109,9 +109,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private ActionEvent SAVE_BUTTON_PRESSED  = new ActionEvent( this, 6, "SAVEDATA" );
 	private ActionEvent TOGGLE_BUTTON_PRESSED = new ActionEvent( this, 7, "TOGGLE" );
 	private ActionEvent DOWNLOAD_BUTTON_PRESSED = new ActionEvent( this, 8, "DOWNLOAD" );
-	private ActionEvent MASKS_BUTTON_PRESSED = new ActionEvent( this, 8, "MASKS" );
- 
-
+	private ActionEvent MASKS_BUTTON_PRESSED = new ActionEvent( this, 9, "MASKS" );
+	private ActionEvent MITOSIS_BUTTON_PRESSED = new ActionEvent( this, 10, "MITOSIS" );
+	private ActionEvent APOPTOSIS_BUTTON_PRESSED = new ActionEvent( this, 11, "APOPTOSIS" );
+	private ActionEvent CLUSTERCOUNT_BUTTON_PRESSED = new ActionEvent( this, 12, "CLUSTERCOUNT" );
+	private ActionEvent PROB_BUTTON_PRESSED = new ActionEvent( this, 13, "PROBABILITIES" );
 	private ImagePlus displayImage;
 	private ImagePlus prvImage;
 	private ImagePlus nxtImage;
@@ -164,31 +166,13 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel = new JPanel();	
 		roiPanel= new JPanel();
 		classPanel= new JPanel();
-		nxt=new JPanel();
 		
+
 		/*
 		 * image panel
 		 */
 		imagePanel.setLayout(new BorderLayout());
-		nxt.setLayout(new BorderLayout());
-	/*	ic=new SimpleCanvas(featureManager.getCurrentImage());
-		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
-		loadImage(displayImage);
-		setOverlay();
-		imagePanel.setBackground(Color.GRAY);		
-		imagePanel.add(ic,BorderLayout.CENTER);
-		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
-		panel.add(imagePanel);
-		*/
-	/*	ic=new SimpleCanvas(featureManager.getCurrentImage());
-		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
-		loadImage(displayImage);
-		setOverlay();
-		imagePanel.setBackground(Color.GRAY);		
-		imagePanel.add(ic,BorderLayout.EAST);
-		imagePanel.setBounds( 10, 710, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
-		panel.add(imagePanel);
-*/
+		
 		ic=new SimpleCanvas(featureManager.getCurrentImage());
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 		loadImage(displayImage);
@@ -198,39 +182,36 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
 		panel.add(imagePanel);
 		
-		nxtImage=featureManager.getNextImageTrack();
 		
+		
+		nxt=new JPanel();
+		nxt.setLayout(new BorderLayout());
+		nxtImage=featureManager.getNextImageTrack();
 		Image imag=nxtImage.getImage();
 		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 		nxtImage=new ImagePlus("Next",imag);
 		ImageCanvas temp=new ImageCanvas(nxtImage);
 		nxt=new JPanel();
 	    nxt.add(temp);
-		nxt.setBounds(420, 710, 340, 260);
+		nxt.setBounds(360, 720, 340, 260);
 		panel.add(nxt); 
 		
-        prvImage=featureManager.getPreviousImageTrack();
-		
-		imag=nxtImage.getImage();
+		prv=new JPanel();
+		prvImage=featureManager.getPreviousImageTrack();
+		imag=prvImage.getImage();
 		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 		nxtImage=new ImagePlus("Prev",imag);
-		temp=new ImageCanvas(nxtImage);
-		prv=new JPanel();
+		temp=new ImageCanvas(prvImage);
 	    prv.add(temp);
-		prv.setBounds(10, 710, 340, 260);
+		prv.setBounds(10, 720, 340, 260);
 		panel.add(nxt);
 	 	panel.add(prv);
 		classPanel.setBounds(785,20,350,100);
 		classPanel.setPreferredSize(new Dimension(350, 100));
 		classPanel.setBorder(BorderFactory.createTitledBorder("Classes"));
 		
-		JScrollPane classScrolPanel = new JScrollPane(classPanel);
-		classScrolPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		classScrolPanel.setBounds(785,20,350,80);
 		addClassPanel();
-		panel.add(classScrolPanel);
-		
-		
+		panel.add(classPanel);
 		/*
 		 * features
 		 */
@@ -264,10 +245,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		JPanel computePanel = new JPanel();
 		addButton(new JButton(), "Next",null , 800, 130, 80, 20,features,NEXT_BUTTON_PRESSED,null );
 	/*	addButton(new JButton(), "Train",null, 550,550,350,100,computePanel, COMPUTE_BUTTON_PRESSED,null);
-		addButton(new JButton(), "Save",null, 550,550,350,100,computePanel, SAVE_BUTTON_PRESSED,null);
+		
 		addButton(new JButton(), "Overlay",null, 550,550,350,100,computePanel, TOGGLE_BUTTON_PRESSED,null);
 		addButton(new JButton(), "Masks",null, 550,550,350,100,computePanel, MASKS_BUTTON_PRESSED,null);
 	*/	
+		addButton(new JButton(), "GetProbabilities",null, 750,170,100,30,features, PROB_BUTTON_PRESSED,null);
 		features.add(computePanel);
 		frame.add(features);
 		
@@ -275,47 +257,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		 *  Data panel
 		 */
 		
-		JPanel dataJPanel = new JPanel();
-		eventType = new JComboBox<EventType>(EventType.values());
-		eventType.setVisible(true);
-		eventType.addItemListener( new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if(featureManager.getProjectType()==ProjectType.CLASSIF) {
-					if(showColorOverlay) {
-						updateGui();
-						updateResultOverlay(null);
-					} else 
-						updateGui();			
-				} else 
-					updateGui();
-
-
-				// here we need to add for classification
-			}
-		});
-		
-		dataJPanel.setBounds(820,240,100,60);
-		eventType.setSelectedIndex(0);
-		eventType.setFont( panelFONT );
-		eventType.setBackground(Color.GRAY);
-		eventType.setForeground(Color.WHITE);
-		dataJPanel.add(eventType);
-		dataJPanel.setBackground(Color.GRAY);
-		
-		panel.add(dataJPanel);
 		
 		/*
 		 * ROI panel
 		 */
-	/*	roiPanel.setBorder(BorderFactory.createTitledBorder("Regions Of Interest"));
+		roiPanel.setBorder(BorderFactory.createTitledBorder("Regions Of Interest"));
 		//roiPanel.setPreferredSize(new Dimension(350, 400));
 		JScrollPane scrollPane = new JScrollPane(roiPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
 		scrollPane.setBounds(805,300,350,250);
 		panel.add(scrollPane);
-	*/	frame.add(panel);
+	    frame.add(panel);
 
 	
 		/*
@@ -342,15 +294,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			classPanel.setPreferredSize(new Dimension(340, 80+30*tempSize));	
 		}
 		roiPanel.setPreferredSize(new Dimension(350, 175*classes));
-		addButton(new JButton(), "ADD CLASS",null , 800, 20, 130, 20,classPanel,ADDCLASS_BUTTON_PRESSED,null );
-		addButton(new JButton(), "SAVE CLASS",null , 800, 20, 130, 20,classPanel,SAVECLASS_BUTTON_PRESSED,null );
-		addButton(new JButton(), "DELETE CLASS",null , 800, 20, 130, 20,classPanel,DELETE_BUTTON_PRESSED,null );
+		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
+		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
+		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
 		for(String key: featureManager.getClassKeys()){
 			String label=featureManager.getClassLabel(key);
 			Color color= featureManager.getClassColor(key);
-			addClasses(key,label,color);
+		//	addClasses(key,label,color);
 			addSidePanel(color,key,label);
-		}		
+		
+		}
+				
 	}
 
 	/**
@@ -451,6 +405,38 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			validateFrame();
 			updateGui();
 		} // end if
+		
+		if(event== MITOSIS_BUTTON_PRESSED){
+			featureManager.addMitosis();
+		} // end if
+		
+		
+		if(event== APOPTOSIS_BUTTON_PRESSED){
+			featureManager.addApoptosis();
+		} // end if
+		
+		
+		if(event== CLUSTERCOUNT_BUTTON_PRESSED){
+			featureManager.addClusterCount();
+		
+		} // end if
+		
+		
+		if(event== PROB_BUTTON_PRESSED){
+			int mito=featureManager.getMitosis();
+			int apopto=featureManager.getApoptosis();
+			int clusto=featureManager.getClusterCount();
+			double normal=mito+apopto+clusto;
+			double temp1=(double)(Math.round(mito/normal *10000d))/10000d;
+			double temp2=(double)(Math.round(apopto/normal *10000d))/10000d;
+			double temp3=(double)(Math.round(clusto/normal *10000d))/10000d;
+			String display="Probabilities Computed\nMitosis:  "+ temp1+"\nApoptosis:  "+temp2+"\nClusterCount:  "+temp3;
+			
+			JOptionPane.showMessageDialog(null, display);
+		
+		}
+		
+		
 		if(event==DELETE_BUTTON_PRESSED){          
 
 			System.out.println(featureManager.getNumOfClasses());
@@ -727,7 +713,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			nxtImage=new ImagePlus("next",imag);
 			ImageCanvas temp=new ImageCanvas(nxtImage);
 		    nxt.add(temp);
-		    nxt.setBounds(420,710,340,260);
+		    nxt.setBounds(360,720,340,260);
 			frame.add(nxt);
 
 			
@@ -738,7 +724,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			prvImage=new ImagePlus("prev",imag);
 			temp=new ImageCanvas(prvImage);
 		    prv.add(temp);
-		    prv.setBounds(10,710,340,260);
+		    prv.setBounds(10,720,340,260);
 			frame.add(prv);	
 			
 		}catch(Exception e){

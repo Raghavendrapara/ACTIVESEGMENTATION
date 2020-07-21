@@ -78,7 +78,7 @@ public class FeatureManager  {
 	private List<Color> defaultColors;
 	ClassifierManager learningManager;
 	private Map<String,Integer> predictionResultClassification;
-
+    private int mitosiscnt,apoptosiscnt,clustercnt;
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
 		this.projectManager = projectManager;
 		this.learningManager=learningManager;
@@ -88,6 +88,9 @@ public class FeatureManager  {
 		//System.out.println(this.projectString);
 		this.featurePath = this.projectInfo.getProjectDirectory().get(ASCommon.FEATURESDIR);
 		this.totalSlices = loadImages(this.projectString);
+		this.mitosiscnt=0;
+		this.apoptosiscnt=0;
+		this.clustercnt=0;
 		this.defaultColors = GuiUtil.setDefaultColors();
 		if (this.totalSlices > 0) {
 			this.sliceNum = 1;
@@ -296,7 +299,37 @@ public class FeatureManager  {
 		return classes.size();
 	}
 
+	public void addMitosis() {
+	
+		mitosiscnt+=1;
+	}
+	
+	public void addApoptosis() {
+		
+		apoptosiscnt+=1;
+	}
+	
+	public void addClusterCount() {
+		 
+		clustercnt+=1;
+	}
+	
+	public int getMitosis() {
+	
+		return mitosiscnt;
+	}
+	
+    public int getApoptosis() {
+		
+    	return apoptosiscnt;
+	}
 
+    public int getClusterCount() {
+	
+    	
+    	return clustercnt;
+     }
+    
 	public void addClass() {
 		String key = UUID.randomUUID().toString();
 		if (!classes.containsKey(key)) {
