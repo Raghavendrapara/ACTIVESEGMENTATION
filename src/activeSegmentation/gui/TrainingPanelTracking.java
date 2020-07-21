@@ -201,25 +201,25 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		nxtImage=featureManager.getNextImageTrack();
 		
 		Image imag=nxtImage.getImage();
-		imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 		nxtImage=new ImagePlus("Next",imag);
 		ImageCanvas temp=new ImageCanvas(nxtImage);
 		nxt=new JPanel();
 	    nxt.add(temp);
-		nxt.setBounds(10, 700, 300, 300);
+		nxt.setBounds(420, 710, 340, 260);
 		panel.add(nxt); 
 		
         prvImage=featureManager.getPreviousImageTrack();
 		
 		imag=nxtImage.getImage();
-		imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 		nxtImage=new ImagePlus("Prev",imag);
 		temp=new ImageCanvas(nxtImage);
-		nxt=new JPanel();
-	    nxt.add(temp);
-		nxt.setBounds(350, 700, 300, 300);
+		prv=new JPanel();
+	    prv.add(temp);
+		prv.setBounds(10, 710, 340, 260);
 		panel.add(nxt);
-	 	
+	 	panel.add(prv);
 		classPanel.setBounds(785,20,350,100);
 		classPanel.setPreferredSize(new Dimension(350, 100));
 		classPanel.setBorder(BorderFactory.createTitledBorder("Classes"));
@@ -723,22 +723,22 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			nxt=new JPanel();
 			nxtImage=featureManager.getNextImageTrack();
 			Image imag=nxtImage.getImage();
-			imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+			imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 			nxtImage=new ImagePlus("next",imag);
 			ImageCanvas temp=new ImageCanvas(nxtImage);
 		    nxt.add(temp);
-		    nxt.setBounds(10,700,300,300);
+		    nxt.setBounds(420,710,340,260);
 			frame.add(nxt);
 
 			
 			prv=new JPanel();
 			prvImage=featureManager.getPreviousImageTrack();
 			imag=prvImage.getImage();
-			imag=imag.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+			imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 			prvImage=new ImagePlus("prev",imag);
 			temp=new ImageCanvas(prvImage);
 		    prv.add(temp);
-		    prv.setBounds(350,700,300,300);
+		    prv.setBounds(10,710,340,260);
 			frame.add(prv);	
 			
 		}catch(Exception e){
