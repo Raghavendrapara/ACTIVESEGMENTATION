@@ -7,6 +7,7 @@ import ij.gui.ImageWindow;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
+import ij.gui.Wand;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 
@@ -18,6 +19,8 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -173,13 +176,14 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		 */
 		imagePanel.setLayout(new BorderLayout());
 		
-		ic=new SimpleCanvas(featureManager.getCurrentImage());
+		ic=new SimpleCanvas(featureManager.getCurrentImage(),featureManager);
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
+		ic.addMouseListener(mouseListener);
 		loadImage(displayImage);
 		setOverlay();
 		imagePanel.setBackground(Color.GRAY);		
 		imagePanel.add(ic,BorderLayout.EAST);
-		imagePanel.setBounds( 10, 10, IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION );		
+		imagePanel.setBounds( 10, 10, ic.getWidth(),ic.getHeight() );		
 		panel.add(imagePanel);
 		
 		
@@ -193,17 +197,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		ImageCanvas temp=new ImageCanvas(nxtImage);
 		nxt=new JPanel();
 	    nxt.add(temp);
-		nxt.setBounds(360, 720, 340, 260);
+		nxt.setBounds(360, ic.getHeight()+30, 340, 260);
 		panel.add(nxt); 
 		
 		prv=new JPanel();
-		prvImage=featureManager.getPreviousImageTrack();
+		prvImage=featureManager.getCurrentImage();
 		imag=prvImage.getImage();
 		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
-		nxtImage=new ImagePlus("Prev",imag);
+		prvImage=new ImagePlus("Prev",imag);
 		temp=new ImageCanvas(prvImage);
 	    prv.add(temp);
-		prv.setBounds(10, 720, 340, 260);
+		prv.setBounds(10, ic.getHeight()+30, 340, 260);
 		panel.add(nxt);
 	 	panel.add(prv);
 		classPanel.setBounds(785,20,350,100);
@@ -713,7 +717,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			nxtImage=new ImagePlus("next",imag);
 			ImageCanvas temp=new ImageCanvas(nxtImage);
 		    nxt.add(temp);
-		    nxt.setBounds(360,720,340,260);
+		    nxt.setBounds(360,ic.getHeight()+30,340,260);
 			frame.add(nxt);
 
 			
@@ -724,7 +728,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			prvImage=new ImagePlus("prev",imag);
 			temp=new ImageCanvas(prvImage);
 		    prv.add(temp);
-		    prv.setBounds(10,720,340,260);
+		    prv.setBounds(10,ic.getHeight()+30,340,260);
 			frame.add(prv);	
 			
 		}catch(Exception e){
@@ -749,21 +753,27 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 */
 	private  MouseListener mouseListener = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
-			JList<?>  theList = ( JList<?>) mouseEvent.getSource();
+	//		JList<?>  theList = ( JList<?>) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 1) {
-				int index = theList.getSelectedIndex();
+		//		int index = theList.getSelectedIndex();
+				
 
-				if (index >= 0) {
+				double X=mouseEvent.getX();
+				double Y=mouseEvent.getY();
+				IJ.doWand((int)X, (int)Y);
+				
+			//	if (index >= 0) {
+				/*
 					String item =theList.getSelectedValue().toString();
 					String[] arr= item.split(" ");
 					//System.out.println("Class Id"+ arr[0].trim());
 					//int sliceNum=Integer.parseInt(arr[2].trim());
 					showSelected( arr[0].trim(),index);
-
-				}
+*/
+			//	}
 			}
 
-			if (mouseEvent.getClickCount() == 2) {
+		/*	if (mouseEvent.getClickCount() == 2) {
 				int index = theList.getSelectedIndex();
 				String type= learningType.getSelectedItem().toString();
 				if (index >= 0) {
@@ -774,7 +784,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 					featureManager.deleteExample(arr[0], Integer.parseInt(arr[1].trim()), type);
 					updateGui();
 				}
-			}
+			}*/
 		}
 	};
 

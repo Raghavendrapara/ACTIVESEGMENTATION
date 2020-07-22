@@ -79,6 +79,7 @@ public class FeatureManager  {
 	ClassifierManager learningManager;
 	private Map<String,Integer> predictionResultClassification;
     private int mitosiscnt,apoptosiscnt,clustercnt;
+    private ImageProcessor TrackTrainProcessor;
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
 		this.projectManager = projectManager;
 		this.learningManager=learningManager;
@@ -758,6 +759,16 @@ public class FeatureManager  {
 			colors.add(classInfo.getColor());
 		}
 		return colors;
+	}
+
+	public void setTrackProcessor(ImageProcessor ip) {
+		// TODO Auto-generated method stub
+		TrackTrainProcessor=ip;
+		
+	}
+	public ImageProcessor getTrack()
+	{
+		return TrackTrainProcessor;
 	}
 
 }

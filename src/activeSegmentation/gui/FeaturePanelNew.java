@@ -164,7 +164,7 @@ public class FeaturePanelNew extends ImageWindow implements ASCommon  {
 		 */
 		imagePanel.setLayout(new BorderLayout());
 		
-		ic=new SimpleCanvas(featureManager.getCurrentImage());
+		ic=new SimpleCanvas(featureManager.getCurrentImage(),featureManager);
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 		loadImage(displayImage);
 		setOverlay();

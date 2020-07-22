@@ -1,12 +1,22 @@
 package activeSegmentation.gui;
 
+import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.Wand;
+import ij.process.ImageProcessor;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import activeSegmentation.feature.FeatureManager;
 
 
 /**
@@ -19,9 +29,12 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 	 * default serial version UID
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public SimpleCanvas(ImagePlus imp)	{
+    FeatureManager featureManager;
+	ImageProcessor ip;
+	
+	public SimpleCanvas(ImagePlus imp,FeatureManager featureMan)	{
 		super(imp);
+		ip=imp.getProcessor();
 		Dimension dim = new Dimension(Math.min(512, imp.getWidth()), Math.min(512, imp.getHeight()));
 		setMinimumSize(dim);
 		setSize(dim.width, dim.height);
@@ -32,6 +45,8 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 				repaint();
 			}
 		});*/
+		this.featureManager=featureMan;
+	 	featureManager.setTrackProcessor(ip);
 	}
 	
 	//@Override
@@ -49,8 +64,28 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 		if (y + h > imp.getHeight()) y = h - imp.getHeight();
 		srcRect.setRect(x, y, w, h);
 		repaint();
+	
 	}
+	
+	
+	private  MouseListener mouseListener = new MouseAdapter() {
+		public void mouseClicked(MouseEvent mouseEvent) {
 
+			if (mouseEvent.getClickCount() == 1) {
+				Point p=MouseInfo.getPointerInfo().getLocation();
+
+				double X=p.getX();
+				double Y=p.getY();
+				Wand w=new Wand(ip);
+				IJ.doWand((int)X, (int)Y);
+				w.autoOutline((int)X, (int)Y);
+				int xpoint[]=w.xpoints;
+				System.out.println(xpoint[2]);
+			
+			}
+
+	
+	}};
 	//@Override
 	public void paint(Graphics g) {
 		Rectangle srcRect = getSrcRect();
