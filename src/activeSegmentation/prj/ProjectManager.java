@@ -294,7 +294,8 @@ public class ProjectManager {
 	private void setProjectDir(String projectDirectory, String projectName) {
 		String projectString;
 		if(projectName!=null) {
-			projectString=projectDirectory+"/"+projectName+"/"+"Training";
+			projectString=projectDirectory+"/"+projectName+"/"+"ActiveSeg&Track";
+		
 		}else {
 			projectString=projectDirectory+"/"+"Training";
 		}
@@ -305,6 +306,8 @@ public class ProjectManager {
 		projectDir.put(ASCommon.LEARNINGDIR, projectString+"/learning/");
 		projectDir.put(ASCommon.EVALUATIONDIR,projectString+"/evaluation/");
 		projectDir.put(ASCommon.IMAGESDIR,projectString+"/images/");
+		projectDir.put(ASCommon.TRACKINGDIR,projectString+"/tracking/");
+		
 	}
 	
 	private void createProjectSpace(String projectDirectory, String projectName) {
@@ -316,6 +319,7 @@ public class ProjectManager {
 		createDirectory(projectDir.get(ASCommon.LEARNINGDIR));
 		createDirectory(projectDir.get(ASCommon.EVALUATIONDIR));
 		createDirectory(projectDir.get(ASCommon.IMAGESDIR));
+		createDirectory(projectDir.get(ASCommon.TRACKINGDIR));
 		IJ.log("DONE");
 	}
 	

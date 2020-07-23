@@ -10,6 +10,7 @@ import ij.gui.TextRoi;
 import ij.gui.Wand;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
+import ijaux.datatype.Pair;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -89,6 +91,10 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
 	private Map<String,RoiListOverlay> roiOverlayList;
 
+	HashMap<String,Roi> roiNameMap=new HashMap<>();;
+	HashMap<String,JList<String>> listRoi=new HashMap<>();
+	JList<String> list;
+	DefaultListModel<String> dl=new DefaultListModel<>();
 	/** Used only during classification setting*/
 	private Map<String,Integer> predictionResultClassification;
 
@@ -132,6 +138,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private JFrame frame;
     private JPanel nxt;
     private JPanel prv;
+    HashMap<Roi,Pair<Integer,String>> roiMap;
 	/*
 	 * constructor 
 	 */
@@ -176,7 +183,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		 */
 		imagePanel.setLayout(new BorderLayout());
 		
-		ic=new SimpleCanvas(featureManager.getCurrentImage(),featureManager);
+		ic=new SimpleCanvas(featureManager.getCurrentImage());
 		ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 		ic.addMouseListener(mouseListener);
 		loadImage(displayImage);
@@ -301,20 +308,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
-		for(String key: featureManager.getClassKeys()){
-			String label=featureManager.getClassLabel(key);
-			Color color= featureManager.getClassColor(key);
-		//	addClasses(key,label,color);
-			addSidePanel(color,key,label);
-		
-		}
-				
+		dl.addElement("A");
+		dl.addElement("B");
+		dl.addElement("C");
+		list=new JList<>(dl);
+		listRoi.put("Example",list);
+	for(String key:listRoi.keySet())
+			addSidePanel(key);
+	
 	}
 
 	/**
 	 * Draw the painted traces on the display image
 	 */
-/*	private void drawExamples(){
+	private void drawExamples(){
 		for(String key: featureManager.getClassKeys()){
 			ArrayList<Roi> rois=(ArrayList<Roi>) featureManager.
 					getExamples(key,learningType.getSelectedItem().toString(), featureManager.getCurrentSlice());
@@ -325,39 +332,35 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 		getImagePlus().updateAndDraw();
 	}
-*/	private void addSidePanel(Color color,String key,String label){
+	private void addSidePanel(String keynm){
 		JPanel panel= new JPanel();
 		JList<String> current=GuiUtil.model();
 
-		current.setForeground(color);
-		exampleList.put(key,current);
-		JList<String> all=GuiUtil.model();
-		all.setForeground(color);
-		allexampleList.put(key,all);	
-		RoiListOverlay roiOverlay = new RoiListOverlay();
-		roiOverlay.setComposite( transparency050 );
-		((OverlayedImageCanvas)ic).addOverlay(roiOverlay);
-		roiOverlayList.put(key,roiOverlay);
+		current.setForeground(Color.WHITE);
+	
+	//	RoiListOverlay roiOverlay = new RoiListOverlay();
+		//roiOverlay.setComposite( transparency050 );
+	//	((OverlayedImageCanvas)ic).addOverlay(roiOverlay);
 		JPanel buttonPanel= new JPanel();
-		buttonPanel.setName(key);
+		buttonPanel.setName(keynm);
 		ActionEvent addbuttonAction= new ActionEvent(buttonPanel, 1,"AddButton");
 		ActionEvent uploadAction= new ActionEvent(buttonPanel, 2,"UploadButton");
 		ActionEvent downloadAction= new ActionEvent(buttonPanel, 3,"DownloadButton");
 		JButton addButton= new JButton();
-		addButton.setName(key);
-		JButton upload= new JButton();
-		upload.setName(key);
-		JButton download= new JButton();
-		download.setName(key);
-		addButton(addButton, label, null, 805,280,350,250, buttonPanel, addbuttonAction, null);
-		addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
-		addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
+		addButton.setName("ADD");
+		//JButton upload= new JButton();
+		//upload.setName(key);
+		//JButton download= new JButton();
+		//download.setName(key);
+		addButton(addButton, "ADD", null, 855,280,350,250, buttonPanel, addbuttonAction, null);
+		//addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
+		//addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
 		roiPanel.add(buttonPanel);
-		panel.add(GuiUtil.addScrollPanel(exampleList.get(key),null));
-		panel.add(GuiUtil.addScrollPanel(allexampleList.get(key),null));
+		String key=""+featureManager.getCurrentSlice();
+		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
+		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
 		roiPanel.add(panel );
-		exampleList.get(key).addMouseListener(mouseListener);
-		allexampleList.get(key).addMouseListener(mouseListener);
+		
 	}
 
 	private void addClasses(String key , String label, Color color){
@@ -412,17 +415,28 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		if(event== MITOSIS_BUTTON_PRESSED){
 			featureManager.addMitosis();
+			Roi roi=displayImage.getRoi();
+			roiNameMap.put(roi.getName(),roi );
+			dl.addElement(roi.getName());
+		    updateGui();
 		} // end if
 		
 		
 		if(event== APOPTOSIS_BUTTON_PRESSED){
 			featureManager.addApoptosis();
+			Roi roi=displayImage.getRoi();
+			roiNameMap.put(roi.getName(),roi );
+			dl.addElement(roi.getName());
+			updateGui();
 		} // end if
 		
 		
 		if(event== CLUSTERCOUNT_BUTTON_PRESSED){
 			featureManager.addClusterCount();
-		
+			Roi roi=displayImage.getRoi();
+			roiNameMap.put(roi.getName(),roi );
+			dl.addElement(roi.getName());
+            updateGui();
 		} // end if
 		
 		
@@ -501,6 +515,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				ic.zoomIn(x_centre,y_centre);
 			}			
 			updateGui();
+			updateGuiFrame();
 		} // end if
 		
 		if(event==NEXT_BUTTON_PRESSED  ){			
@@ -523,6 +538,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			}
 			//imagePanel.add(ic);
 			updateGui();
+			updateGuiFrame();
 		} // end if
 		
 		if(event==COMPUTE_BUTTON_PRESSED){
@@ -584,15 +600,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		if(event.getActionCommand()== "AddButton"){	
 			String key=((Component)event.getSource()).getName();
-			final Roi r = displayImage.getRoi();
-			if (null == r)
-				return;
-			displayImage.killRoi();
-			
-			if(featureManager.addExample(key,r,learningType.getSelectedItem().toString(),featureManager.getCurrentSlice()))
+			System.out.println(key);
 				updateGui();
-			else 
-			    JOptionPane.showMessageDialog(null, "Other class already contain roi");	
 	
 			
 		} //end if
@@ -704,11 +713,21 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	
 	private void updateGui(){
 		try{
-	//		drawExamples();
-	//		updateExampleLists();
+			
 			//updateallExampleLists();
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 			ic.repaint();
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	private void updateGuiFrame(){
+		try{
+			
+		
 			
 			nxt=new JPanel();
 			nxtImage=featureManager.getNextImageTrack();
@@ -736,7 +755,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 	}
 
-/*	private void updateExampleLists()	{
+	/*private void updateExampleLists()	{
 		LearningType type=(LearningType) learningType.getSelectedItem();
 		for(String key:featureManager.getClassKeys()){
 			exampleList.get(key).removeAll();
@@ -751,26 +770,25 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 	}	
 */
-	private  MouseListener mouseListener = new MouseAdapter() {
+	private  MouseListener mouseListener1 = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
-	//		JList<?>  theList = ( JList<?>) mouseEvent.getSource();
+			JList<?>  theList = ( JList<?>) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 1) {
-		//		int index = theList.getSelectedIndex();
+				int index = theList.getSelectedIndex();
 				
 
 				double X=mouseEvent.getX();
 				double Y=mouseEvent.getY();
 				IJ.doWand((int)X, (int)Y);
 				
-			//	if (index >= 0) {
-				/*
+				if (index >= 0) {
+				
 					String item =theList.getSelectedValue().toString();
-					String[] arr= item.split(" ");
 					//System.out.println("Class Id"+ arr[0].trim());
 					//int sliceNum=Integer.parseInt(arr[2].trim());
-					showSelected( arr[0].trim(),index);
-*/
-			//	}
+					showSelected( roiNameMap.get(item));
+
+				}
 			}
 
 		/*	if (mouseEvent.getClickCount() == 2) {
@@ -787,24 +805,49 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			}*/
 		}
 	};
+	
+	private  MouseListener mouseListener = new MouseAdapter() {
+		public void mouseClicked(MouseEvent mouseEvent) {
+			
+			if (mouseEvent.getClickCount() == 1) {
+				
 
+				double X=mouseEvent.getX();
+				double Y=mouseEvent.getY();
+				IJ.doWand((int)X, (int)Y);
+				
+						}
 
+		/*	if (mouseEvent.getClickCount() == 2) {
+				int index = theList.getSelectedIndex();
+				String type= learningType.getSelectedItem().toString();
+				if (index >= 0) {
+					String item =theList.getSelectedValue().toString();
+					//System.out.println("ITEM : "+ item);
+					String[] arr= item.split(" ");
+					//int classId= featureManager.getclassKey(arr[0].trim())-1;
+					featureManager.deleteExample(arr[0], Integer.parseInt(arr[1].trim()), type);
+					updateGui();
+				}
+			}*/
+		}
+	};
 	/**
 	 * Select a list and deselect the others
 	 * @param e item event (originated by a list)
 	 * @param i list index
 	 */
-	private void showSelected(String classKey,int index ){
+	private void showSelected(Roi roi ){
 		updateGui();
 
 
 		displayImage.setColor(Color.YELLOW);
-		String type= learningType.getSelectedItem().toString();
+		//String type= learningType.getSelectedItem().toString();
 		//System.out.println(classKey+"--"+index+"---"+type);
-		final Roi newRoi = featureManager.getRoi(classKey, index,type);	
+		//final Roi newRoi = featureManager.getRoi(classKey, index,type);	
 		//System.out.println(newRoi);
-		newRoi.setImage(displayImage);
-		displayImage.setRoi(newRoi);
+		roi.setImage(displayImage);
+		displayImage.setRoi(roi);
 		displayImage.updateAndDraw();
 	}  
 	private JButton addButton(final JButton button ,final String label, final Icon icon, final int x,

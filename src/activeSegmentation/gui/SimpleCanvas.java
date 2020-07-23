@@ -29,12 +29,10 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 	 * default serial version UID
 	 */
 	private static final long serialVersionUID = 1L;
-    FeatureManager featureManager;
-	ImageProcessor ip;
+   
 	
-	public SimpleCanvas(ImagePlus imp,FeatureManager featureMan)	{
+	public SimpleCanvas(ImagePlus imp)	{
 		super(imp);
-		ip=imp.getProcessor();
 		Dimension dim = new Dimension(Math.min(512, imp.getWidth()), Math.min(512, imp.getHeight()));
 		setMinimumSize(dim);
 		setSize(dim.width, dim.height);
@@ -45,8 +43,6 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 				repaint();
 			}
 		});*/
-		this.featureManager=featureMan;
-	 	featureManager.setTrackProcessor(ip);
 	}
 	
 	//@Override
@@ -68,25 +64,7 @@ public class SimpleCanvas extends OverlayedImageCanvas {
 	}
 	
 	
-	private  MouseListener mouseListener = new MouseAdapter() {
-		public void mouseClicked(MouseEvent mouseEvent) {
-
-			if (mouseEvent.getClickCount() == 1) {
-				Point p=MouseInfo.getPointerInfo().getLocation();
-
-				double X=p.getX();
-				double Y=p.getY();
-				Wand w=new Wand(ip);
-				IJ.doWand((int)X, (int)Y);
-				w.autoOutline((int)X, (int)Y);
-				int xpoint[]=w.xpoints;
-				System.out.println(xpoint[2]);
-			
-			}
-
-	
-	}};
-	//@Override
+//@Override
 	public void paint(Graphics g) {
 		Rectangle srcRect = getSrcRect();
 		double mag = getMagnification();
