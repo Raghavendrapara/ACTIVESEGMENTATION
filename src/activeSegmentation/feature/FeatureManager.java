@@ -164,6 +164,10 @@ public class FeatureManager  {
 			return false;
 		
 	}
+	public void addtoManager(Roi roi)
+	{
+		roiman.addRoi(roi);
+	}
 	
 	/*
 	 * improve

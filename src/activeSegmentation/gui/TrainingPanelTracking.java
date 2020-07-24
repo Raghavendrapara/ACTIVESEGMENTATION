@@ -8,6 +8,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.Wand;
+import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 import ijaux.datatype.Pair;
@@ -69,7 +70,6 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
 	private FeatureManager featureManager;
 	/** opacity (in %) of the result overlay image */
 	int overlayOpacity = 33;
@@ -87,6 +87,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	private Map<String, JList<String>> exampleList;
 	private Map<String, JList<String>> allexampleList;
+	private Vector<String> templist=new Vector<>();
 
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
 	private Map<String,RoiListOverlay> roiOverlayList;
@@ -153,6 +154,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		roiOverlayList = new HashMap<String, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
+		
 		showPanel();
 	}
 
@@ -308,9 +310,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
-		dl.addElement("A");
-		dl.addElement("B");
-		dl.addElement("C");
+		dl.addElement("       Example      ");
 		list=new JList<>(dl);
 		listRoi.put("Example",list);
 	for(String key:listRoi.keySet())
@@ -415,28 +415,37 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		if(event== MITOSIS_BUTTON_PRESSED){
 			featureManager.addMitosis();
+			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
-			roiNameMap.put(roi.getName(),roi );
-			dl.addElement(roi.getName());
-		    updateGui();
+			featureManager.addtoManager(roi);
+			String key=featureManager.getCurrentSlice()+" "+roi.getName();
+			roiNameMap.put(key,roi );
+			templist.addElement(key);
+		    updateroiList(key1);
 		} // end if
 		
 		
 		if(event== APOPTOSIS_BUTTON_PRESSED){
 			featureManager.addApoptosis();
+			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
-			roiNameMap.put(roi.getName(),roi );
-			dl.addElement(roi.getName());
-			updateGui();
+			featureManager.addtoManager(roi);
+			String key=featureManager.getCurrentSlice()+" "+roi.getName();
+			roiNameMap.put(key,roi );
+			templist.addElement(key);
+		    updateroiList(key1);
 		} // end if
 		
 		
 		if(event== CLUSTERCOUNT_BUTTON_PRESSED){
+			String key1=((Component)event.getSource()).getName();
 			featureManager.addClusterCount();
 			Roi roi=displayImage.getRoi();
-			roiNameMap.put(roi.getName(),roi );
-			dl.addElement(roi.getName());
-            updateGui();
+			featureManager.addtoManager(roi);
+			String key=featureManager.getCurrentSlice()+" "+roi.getName();
+			roiNameMap.put(key,roi );
+			templist.addElement(key);
+		    updateroiList(key1);
 		} // end if
 		
 		
@@ -495,7 +504,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			updateGui();
 		} // end if
 		
-		if(event == PREVIOUS_BUTTON_PRESSED){			
+		if(event == PREVIOUS_BUTTON_PRESSED){		
 			ImagePlus image=featureManager.getPreviousImage();
 			imageNum.setText(Integer.toString(featureManager.getCurrentSlice()));
 			loadImage(image);
@@ -601,7 +610,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		if(event.getActionCommand()== "AddButton"){	
 			String key=((Component)event.getSource()).getName();
 			System.out.println(key);
-				updateGui();
+			Roi roi=displayImage.getRoi();
+			featureManager.addtoManager(roi);
+			String key1=featureManager.getCurrentSlice()+" "+roi.getName();
+			templist.addElement(key1);
+			updateroiList(key);
 	
 			
 		} //end if
@@ -717,7 +730,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			//updateallExampleLists();
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
 			ic.repaint();
-			
+		
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -755,6 +768,15 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 	}
 
+	private void updateroiList(String key)
+	{
+		key="Example";
+	    listRoi.get(key).removeAll();	
+	    System.out.print(templist.firstElement());
+		listRoi.get(key).setListData(templist);
+		listRoi.get(key).setForeground(Color.gray);
+		
+	}
 	/*private void updateExampleLists()	{
 		LearningType type=(LearningType) learningType.getSelectedItem();
 		for(String key:featureManager.getClassKeys()){
