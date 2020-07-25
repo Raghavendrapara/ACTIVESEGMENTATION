@@ -80,6 +80,7 @@ public class FeatureManager  {
 	private Map<String,Integer> predictionResultClassification;
     private int mitosiscnt,apoptosiscnt,clustercnt;
     private ImageProcessor TrackTrainProcessor;
+    
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
 		this.projectManager = projectManager;
 		this.learningManager=learningManager;
@@ -168,7 +169,10 @@ public class FeatureManager  {
 	{
 		roiman.addRoi(roi);
 	}
-	
+	public RoiManager getRoiMan()
+	{
+		return roiman;
+	}
 	/*
 	 * improve
 	 */

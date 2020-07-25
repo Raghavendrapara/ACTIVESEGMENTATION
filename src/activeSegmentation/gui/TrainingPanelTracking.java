@@ -30,6 +30,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,8 @@ import activeSegmentation.EventType;
 import activeSegmentation.LearningType;
 import activeSegmentation.ProjectType;
 import activeSegmentation.feature.FeatureManager;
+import activeSegmentation.feature.GroundTruthExtractor;
+import activeSegmentation.prj.ProjectManager;
 import activeSegmentation.util.GuiUtil;
 
 import static  activeSegmentation.ProjectType.*;
@@ -88,6 +91,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private Map<String, JList<String>> exampleList;
 	private Map<String, JList<String>> allexampleList;
 	private Vector<String> templist=new Vector<>();
+	private Vector<String> templistFrame=new Vector<>();
 
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
 	private Map<String,RoiListOverlay> roiOverlayList;
@@ -139,11 +143,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private JFrame frame;
     private JPanel nxt;
     private JPanel prv;
+    private ArrayList<Roi> CurrentTrackFrameRoiList;
     HashMap<Roi,Pair<Integer,String>> roiMap;
 	/*
 	 * constructor 
 	 */
-	public TrainingPanelTracking(FeatureManager featureManager) {		
+	public TrainingPanelTracking(FeatureManager featureManager)  {		
 		super(featureManager.getCurrentImage());
 		this.featureManager = featureManager;
 		this.displayImage= featureManager.getCurrentImage();
@@ -154,7 +159,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		roiOverlayList = new HashMap<String, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
-		
+		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),0,255,0);
 		showPanel();
 	}
 
@@ -310,7 +315,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
-		dl.addElement("       Example      ");
+        for(Roi rr:CurrentTrackFrameRoiList)
+		dl.addElement(rr.getName());
 		list=new JList<>(dl);
 		listRoi.put("Example",list);
 	for(String key:listRoi.keySet())
@@ -385,7 +391,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		 button.addActionListener( new ActionListener()	{
 			@Override
 			public void actionPerformed( final ActionEvent e )	{
-				doAction(action);
+					doAction(action);
+				
 			}
 		} );
 	 
@@ -524,6 +531,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				ic.zoomIn(x_centre,y_centre);
 			}			
 			updateGui();
+			try {
+				updateFrame();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			updateGuiFrame();
 		} // end if
 		
@@ -547,6 +560,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			}
 			//imagePanel.add(ic);
 			updateGui();
+			try {
+				updateFrame();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			updateGuiFrame();
 		} // end if
 		
@@ -633,6 +652,21 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	}
 
+	private void updateFrame() throws IOException
+	{
+		String key="Example";
+		for(Roi rr:featureManager.getRoiMan().getRoisAsArray())
+        displayImage.killRoi();
+			
+		featureManager.getRoiMan().reset();
+		CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),0,255,0);
+		templistFrame.clear();
+		for(Roi rr:CurrentTrackFrameRoiList)
+	    templistFrame.addElement(rr.getName());
+			listRoi.get(key).removeAll();	
+			listRoi.get(key).setListData(templistFrame);
+			listRoi.get(key).setForeground(Color.gray);
+	}
 
 	/**
 	 * Toggle between overlay and original image with markings
