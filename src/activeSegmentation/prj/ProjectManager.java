@@ -294,7 +294,7 @@ public class ProjectManager {
 	private void setProjectDir(String projectDirectory, String projectName) {
 		String projectString;
 		if(projectName!=null) {
-			projectString=projectDirectory+"/"+projectName+"/"+"ActiveSeg&Track";
+			projectString=projectDirectory+"/"+projectName+"/"+"Training";
 		
 		}else {
 			projectString=projectDirectory+"/"+"Training";

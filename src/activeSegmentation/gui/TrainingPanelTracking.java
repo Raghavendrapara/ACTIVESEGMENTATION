@@ -30,6 +30,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -226,7 +228,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	 	panel.add(prv);
 		classPanel.setBounds(785,20,350,100);
 		classPanel.setPreferredSize(new Dimension(350, 100));
-		classPanel.setBorder(BorderFactory.createTitledBorder("Classes"));
+		classPanel.setBorder(BorderFactory.createTitledBorder("Events"));
 		
 		addClassPanel();
 		panel.add(classPanel);
@@ -323,7 +325,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			addSidePanel(key);
 	
 	}
-
+    
 	/**
 	 * Draw the painted traces on the display image
 	 */
@@ -365,6 +367,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		String key=""+featureManager.getCurrentSlice();
 		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
 		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
+		listRoi.get(keynm).addMouseListener(mouseListener1);
 		roiPanel.add(panel );
 		
 	}
@@ -412,6 +415,15 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		frame.repaint();
 	}
 
+	private void resetRois()
+	{
+		String key="Example";
+		for(Roi rr:featureManager.getRoiMan().getRoisAsArray())
+        displayImage.killRoi();
+			
+		featureManager.getRoiMan().reset();
+		
+	}
 	public void doAction( final ActionEvent event ) {
 		if(event== ADDCLASS_BUTTON_PRESSED){
 			featureManager.addClass();
@@ -428,6 +440,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
 			roiNameMap.put(key,roi );
 			templist.addElement(key);
+			resetRois();
 		    updateroiList(key1);
 		} // end if
 		
@@ -831,36 +844,40 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			JList<?>  theList = ( JList<?>) mouseEvent.getSource();
 			if (mouseEvent.getClickCount() == 1) {
 				int index = theList.getSelectedIndex();
-				
 
-				double X=mouseEvent.getX();
-				double Y=mouseEvent.getY();
-				IJ.doWand((int)X, (int)Y);
-				
 				if (index >= 0) {
-				
 					String item =theList.getSelectedValue().toString();
+					
 					//System.out.println("Class Id"+ arr[0].trim());
 					//int sliceNum=Integer.parseInt(arr[2].trim());
-					showSelected( roiNameMap.get(item));
+					showSelected( item);
 
 				}
 			}
 
 		/*	if (mouseEvent.getClickCount() == 2) {
 				int index = theList.getSelectedIndex();
-				String type= learningType.getSelectedItem().toString();
 				if (index >= 0) {
 					String item =theList.getSelectedValue().toString();
 					//System.out.println("ITEM : "+ item);
-					String[] arr= item.split(" ");
-					//int classId= featureManager.getclassKey(arr[0].trim())-1;
-					featureManager.deleteExample(arr[0], Integer.parseInt(arr[1].trim()), type);
+				    
 					updateGui();
 				}
 			}*/
 		}
 	};
+	
+	private void showSelected(String classKey ){
+		updateGui();
+
+
+		displayImage.setColor(Color.YELLOW);
+	
+		//System.out.println(classKey+"--"+index+"---"+type);
+		
+		displayImage.setRoi(roiNameMap.get(classKey));
+		displayImage.updateAndDraw();
+	} 
 	
 	private  MouseListener mouseListener = new MouseAdapter() {
 		public void mouseClicked(MouseEvent mouseEvent) {
@@ -874,20 +891,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				
 						}
 
-		/*	if (mouseEvent.getClickCount() == 2) {
-				int index = theList.getSelectedIndex();
-				String type= learningType.getSelectedItem().toString();
-				if (index >= 0) {
-					String item =theList.getSelectedValue().toString();
-					//System.out.println("ITEM : "+ item);
-					String[] arr= item.split(" ");
-					//int classId= featureManager.getclassKey(arr[0].trim())-1;
-					featureManager.deleteExample(arr[0], Integer.parseInt(arr[1].trim()), type);
-					updateGui();
-				}
-			}*/
 		}
 	};
+	
+	
+	
 	/**
 	 * Select a list and deselect the others
 	 * @param e item event (originated by a list)
