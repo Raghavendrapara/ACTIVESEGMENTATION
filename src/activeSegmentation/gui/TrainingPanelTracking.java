@@ -98,7 +98,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
 	private Map<String,RoiListOverlay> roiOverlayList;
 
-	HashMap<String,Roi> roiNameMap=new HashMap<>();;
+	HashMap<String,Roi> roiNameMap=new HashMap<>();
+	HashMap<String,Roi> roiNameMapAll=new HashMap<>();
 	HashMap<String,JList<String>> listRoi=new HashMap<>();
 	JList<String> list;
 	DefaultListModel<String> dl=new DefaultListModel<>();
@@ -161,7 +162,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		roiOverlayList = new HashMap<String, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
-		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),0,255,0);
+		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
+		resetRois();
 		showPanel();
 	}
 
@@ -317,11 +319,13 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
-        for(Roi rr:CurrentTrackFrameRoiList)
+        for(Roi rr:CurrentTrackFrameRoiList) {
 		dl.addElement(rr.getName());
+		roiNameMapAll.put(rr.getName(), rr);
+        }
 		list=new JList<>(dl);
 		listRoi.put("Example",list);
-	for(String key:listRoi.keySet())
+	    for(String key:listRoi.keySet())
 			addSidePanel(key);
 	
 	}
@@ -401,7 +405,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	 
 	}
 	
-	private void loadImage(ImagePlus image){
+	private void loadImage(ImagePlus image) {
 		this.displayImage=image;
 		setImage(this.displayImage);
 		updateImage(this.displayImage);
@@ -418,7 +422,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private void resetRois()
 	{
 		String key="Example";
-		for(Roi rr:featureManager.getRoiMan().getRoisAsArray())
+		
         displayImage.killRoi();
 			
 		featureManager.getRoiMan().reset();
@@ -453,6 +457,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
 			roiNameMap.put(key,roi );
 			templist.addElement(key);
+			resetRois();
 		    updateroiList(key1);
 		} // end if
 		
@@ -465,7 +470,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
 			roiNameMap.put(key,roi );
 			templist.addElement(key);
-		    updateroiList(key1);
+            resetRois();
+			updateroiList(key1);
 		} // end if
 		
 		
@@ -544,12 +550,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				ic.zoomIn(x_centre,y_centre);
 			}			
 			updateGui();
-			try {
-				updateFrame();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			updateFrame();
 			updateGuiFrame();
 		} // end if
 		
@@ -573,12 +574,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			}
 			//imagePanel.add(ic);
 			updateGui();
-			try {
-				updateFrame();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			updateFrame();
 			updateGuiFrame();
 		} // end if
 		
@@ -646,6 +642,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			featureManager.addtoManager(roi);
 			String key1=featureManager.getCurrentSlice()+" "+roi.getName();
 			templist.addElement(key1);
+			resetRois();
 			updateroiList(key);
 	
 			
@@ -665,17 +662,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	}
 
-	private void updateFrame() throws IOException
+	private void updateFrame() 
 	{
 		String key="Example";
-		for(Roi rr:featureManager.getRoiMan().getRoisAsArray())
+		
         displayImage.killRoi();
 			
 		featureManager.getRoiMan().reset();
-		CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),0,255,0);
+		CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),1,255,0);
+		resetRois();
 		templistFrame.clear();
-		for(Roi rr:CurrentTrackFrameRoiList)
+		for(Roi rr:CurrentTrackFrameRoiList) {
 	    templistFrame.addElement(rr.getName());
+	    roiNameMapAll.put(rr.getName(), rr);
+		}
 			listRoi.get(key).removeAll();	
 			listRoi.get(key).setListData(templistFrame);
 			listRoi.get(key).setForeground(Color.gray);
@@ -819,7 +819,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	{
 		key="Example";
 	    listRoi.get(key).removeAll();	
-	    System.out.print(templist.firstElement());
+	   // System.out.print(templist.firstElement());
 		listRoi.get(key).setListData(templist);
 		listRoi.get(key).setForeground(Color.gray);
 		
@@ -855,15 +855,28 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				}
 			}
 
-		/*	if (mouseEvent.getClickCount() == 2) {
+			if (mouseEvent.getClickCount() == 2) {
 				int index = theList.getSelectedIndex();
+				String key="Example";
 				if (index >= 0) {
 					String item =theList.getSelectedValue().toString();
-					//System.out.println("ITEM : "+ item);
-				    
+			
+					if(templistFrame.contains(item)) {
+			         //System.out.println("ITEM : "+ item);
+				    templistFrame.remove(item);
+				    listRoi.get(key).removeAll();	
+					listRoi.get(key).setListData(templistFrame);
+					listRoi.get(key).setForeground(Color.gray);
+					}
+				    else {
+				    	templist.remove(item);
+				    	listRoi.get(key).removeAll();	
+						listRoi.get(key).setListData(templist);
+						listRoi.get(key).setForeground(Color.gray);}
+				    updateroiList("Example");
 					updateGui();
 				}
-			}*/
+			}
 		}
 	};
 	
@@ -874,8 +887,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		displayImage.setColor(Color.YELLOW);
 	
 		//System.out.println(classKey+"--"+index+"---"+type);
-		
+		if(roiNameMapAll.get(classKey)!=null)
+		displayImage.setRoi(roiNameMapAll.get(classKey));
+		else
 		displayImage.setRoi(roiNameMap.get(classKey));
+		
 		displayImage.updateAndDraw();
 	} 
 	
