@@ -12,12 +12,12 @@ public class Arc {
 		mEnd=aEnd;
 	}
 	
-	Node GetStart()
+	Node getStart()
 	{
 		return mStart;
 	}
 	
-	Node GetEnd()
+	Node getEnd()
 	{
 		return mEnd;
 	}

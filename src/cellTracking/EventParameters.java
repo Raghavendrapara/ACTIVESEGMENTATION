@@ -17,7 +17,7 @@ public class EventParameters {
 		
 		
 	}
-	double GetPlusScore()
+	double getPlusScore()
 	{
 		if (mValue < mNumScores-1) {
 			return mScore.get(mValue+1) - mScore.get(mValue);
@@ -27,7 +27,7 @@ public class EventParameters {
 		}
 	}
 
-	double GetMinusScore()
+	double getMinusScore()
 	{
 	
 		if (mValue < mNumScores) {
