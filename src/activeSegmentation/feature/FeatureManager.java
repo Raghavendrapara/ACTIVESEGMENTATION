@@ -78,7 +78,7 @@ public class FeatureManager  {
 	private List<Color> defaultColors;
 	ClassifierManager learningManager;
 	private Map<String,Integer> predictionResultClassification;
-    private int mitosiscnt,apoptosiscnt,clustercnt;
+    private int mitosiscnt,apoptosiscnt,clustercnt,migrationcnt;
     private ImageProcessor TrackTrainProcessor;
     
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
@@ -323,6 +323,11 @@ public class FeatureManager  {
 		clustercnt+=1;
 	}
 	
+	public void addMigration(int cnt) {
+		 
+		migrationcnt+=cnt;
+	}
+	
 	public int getMitosis() {
 	
 		return mitosiscnt;
@@ -331,6 +336,11 @@ public class FeatureManager  {
     public int getApoptosis() {
 		
     	return apoptosiscnt;
+	}
+    
+    public int getMigration(){
+		
+    	return migrationcnt;
 	}
 
     public int getClusterCount() {

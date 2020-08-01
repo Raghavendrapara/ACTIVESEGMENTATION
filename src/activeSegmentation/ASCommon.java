@@ -100,10 +100,10 @@ public interface ASCommon {
 	public static int  frameWidth=550;
 	public static int  frameHeight=450;
 	
-	public static int  largeframeWidth=1200;
-	public static int  largeframeHight=1000;
+	public static int  largeframeWidth=1000;
+	public static int  largeframeHight=600;
 	
-	public static final int IMAGE_CANVAS_DIMENSION = 700; //same width and height	
+	public static final int IMAGE_CANVAS_DIMENSION = 512; //same width and height	
 	
 	/*
 	 * Fonts

@@ -90,10 +90,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	byte[] green = new byte[ 256 ];
 	byte[] blue = new byte[ 256 ];
 
-	private Map<String, JList<String>> exampleList;
-	private Map<String, JList<String>> allexampleList;
 	private Vector<String> templist=new Vector<>();
 	private Vector<String> templistFrame=new Vector<>();
+	public static final int  largeframeWidth=1200;
+	public static final int  largeframeHight=1000;
+	
+	public static final int IMAGE_CANVAS_DIMENSION = 700; //same width and height	
 
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
 	private Map<String,RoiListOverlay> roiOverlayList;
@@ -157,12 +159,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		this.displayImage= featureManager.getCurrentImage();
 		this.jCheckBoxList= new ArrayList<JCheckBox>();
 		this.jTextList= new HashMap<String,JTextArea>();
-		this.exampleList = new HashMap<String, JList<String>>();
-		this.allexampleList = new HashMap<String, JList<String>>();
+		
 		roiOverlayList = new HashMap<String, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
 		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
+		featureManager.addMigration(CurrentTrackFrameRoiList.size());
 		resetRois();
 		showPanel();
 	}
@@ -476,11 +478,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		
 		if(event== PROB_BUTTON_PRESSED){
-			int mito=featureManager.getMitosis();
+			int mitosi=featureManager.getMitosis();
 			int apopto=featureManager.getApoptosis();
 			int clusto=featureManager.getClusterCount();
-			double normal=mito+apopto+clusto;
-			double temp1=(double)(Math.round(mito/normal *10000d))/10000d;
+			int migrat=featureManager.getMigration();
+			double normal=mitosi+apopto+clusto+migrat;
+			double temp1=(double)(Math.round(mitosi/normal *10000d))/10000d;
 			double temp2=(double)(Math.round(apopto/normal *10000d))/10000d;
 			double temp3=(double)(Math.round(clusto/normal *10000d))/10000d;
 			String display="Probabilities Computed\nMitosis:  "+ temp1+"\nApoptosis:  "+temp2+"\nClusterCount:  "+temp3;
@@ -670,6 +673,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			
 		featureManager.getRoiMan().reset();
 		CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),1,255,0);
+		featureManager.addMigration(CurrentTrackFrameRoiList.size());
 		resetRois();
 		templistFrame.clear();
 		for(Roi rr:CurrentTrackFrameRoiList) {
@@ -824,6 +828,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		listRoi.get(key).setForeground(Color.gray);
 		
 	}
+	
+	private void updateroiFrameList(String key)
+	{
+		
+		
+		key="Example";
+	    listRoi.get(key).removeAll();	
+	   // System.out.print(templist.firstElement());
+		listRoi.get(key).setListData(templistFrame);
+		listRoi.get(key).setForeground(Color.gray);
+		
+		
+		
+	}
 	/*private void updateExampleLists()	{
 		LearningType type=(LearningType) learningType.getSelectedItem();
 		for(String key:featureManager.getClassKeys()){
@@ -862,18 +880,21 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 					String item =theList.getSelectedValue().toString();
 			
 					if(templistFrame.contains(item)) {
-			         //System.out.println("ITEM : "+ item);
+			      //  System.out.println("ITEM : "+ item);
 				    templistFrame.remove(item);
 				    listRoi.get(key).removeAll();	
 					listRoi.get(key).setListData(templistFrame);
-					listRoi.get(key).setForeground(Color.gray);
+					listRoi.get(key).setForeground(Color.BLACK);
+					updateroiFrameList(key);
+						updateGui();
+					
 					}
 				    else {
 				    	templist.remove(item);
 				    	listRoi.get(key).removeAll();	
 						listRoi.get(key).setListData(templist);
-						listRoi.get(key).setForeground(Color.gray);}
-				    updateroiList("Example");
+						listRoi.get(key).setForeground(Color.BLACK);}
+				        updateroiList(key);
 					updateGui();
 				}
 			}
