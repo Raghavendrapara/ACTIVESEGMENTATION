@@ -461,7 +461,7 @@ public class FeatureManager  {
 
 	public boolean uploadTrackTraining(String filename, List<Roi> rois) {
 		String fileStoreAt=trackPath+"/"+filename+ASCommon.FORMAT;
-		System.out.println(fileStoreAt);
+		//System.out.println(fileStoreAt);
 		DataOutputStream out = null;
 		try {
 			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileStoreAt));
