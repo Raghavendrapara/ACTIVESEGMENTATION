@@ -69,7 +69,7 @@ public class FeatureManager  {
 	private ProjectManager projectManager;
 	private ProjectInfo projectInfo;
 	private Random rand = new Random();
-	private String projectString, featurePath;
+	private String projectString, featurePath, trackPath;
 	private int sliceNum, totalSlices;
 	private List<String> images;
 	private Map<ProjectType, IFeature> featureMap = new HashMap<ProjectType, IFeature>();
@@ -89,10 +89,12 @@ public class FeatureManager  {
 		this.projectString = this.projectInfo.getProjectDirectory().get(ASCommon.IMAGESDIR);
 		//System.out.println(this.projectString);
 		this.featurePath = this.projectInfo.getProjectDirectory().get(ASCommon.FEATURESDIR);
+		this.trackPath = this.projectInfo.getProjectDirectory().get(ASCommon.TRACKINGDIR);
 		this.totalSlices = loadImages(this.projectString);
 		this.mitosiscnt=0;
 		this.apoptosiscnt=0;
 		this.clustercnt=0;
+		this.migrationcnt=0;
 		this.defaultColors = GuiUtil.setDefaultColors();
 		if (this.totalSlices > 0) {
 			this.sliceNum = 1;
@@ -447,12 +449,44 @@ public class FeatureManager  {
 				saveRois(featurePath + "/" + fileName, classRois);
 				featureInfo.setZipFile(fileName);
 			}
+		  
 			projectInfo.addFeature(featureInfo);
 		}
 
 		projectManager.writeMetaInfo(projectInfo);
 	}
 
+	
+	
+
+	public boolean uploadTrackTraining(String filename, List<Roi> rois) {
+		String fileStoreAt=trackPath+"/"+filename+ASCommon.FORMAT;
+		System.out.println(fileStoreAt);
+		DataOutputStream out = null;
+		try {
+			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(fileStoreAt));
+			out = new DataOutputStream(new BufferedOutputStream(zos));
+			RoiEncoder re = new RoiEncoder(out);
+			for (Roi roi : rois) {
+				//System.out.println(roi.getName());
+				zos.putNextEntry(new ZipEntry(roi.getName() + ".roi"));
+				re.write(roi);
+				out.flush();
+			}
+			out.close();
+		} catch (IOException e) {
+
+			return false;
+		} finally {
+			if (out != null)
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+		}
+		return true;
+	}
+	
 	public IDataSet extractFeatures(ProjectType featureType) {
        // System.out.println(featureType);
 		featureMap.get(featureType).createTrainingInstance(classes.values());

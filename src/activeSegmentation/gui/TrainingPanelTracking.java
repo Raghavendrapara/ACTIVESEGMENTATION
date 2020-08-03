@@ -8,6 +8,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.Wand;
+import ij.io.RoiEncoder;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
@@ -32,12 +33,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -362,12 +368,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		ActionEvent downloadAction= new ActionEvent(buttonPanel, 3,"DownloadButton");
 		JButton addButton= new JButton();
 		addButton.setName("ADD");
-		//JButton upload= new JButton();
-		//upload.setName(key);
+		JButton upload= new JButton();
+		upload.setName(keynm);
 		//JButton download= new JButton();
 		//download.setName(key);
 		addButton(addButton, "ADD", null, 855,280,350,250, buttonPanel, addbuttonAction, null);
-		//addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
+		addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
 		//addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
 		roiPanel.add(buttonPanel);
 		String key=""+featureManager.getCurrentSlice();
@@ -378,23 +384,6 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 	}
 
-	private void addClasses(String key , String label, Color color){
-		JCheckBox  checkBox = new JCheckBox();
-		checkBox.setName(key);
-		jCheckBoxList.add(checkBox);
-		JTextArea textArea= new JTextArea();
-		textArea.setName(key);
-		textArea.setText(label );
-		jTextList.put(key, textArea);
-		classPanel.add(checkBox);
-		classPanel.add(textArea);
-		JButton button= new JButton();
-		button.setBackground(color);
-		button.setName(key);
-		ActionEvent colorAction= new ActionEvent(button, color.getRGB(),"ColorButton");
-		addAction(button, colorAction);		
-		classPanel.add(button);
-	}
 
 	private void addAction(JButton button ,final  ActionEvent action){
 		 button.addActionListener( new ActionListener()	{
@@ -653,18 +642,25 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		if(event.getActionCommand()== "UploadButton"){	
 			String key=((Component)event.getSource()).getName();
-			uploadExamples(key);
+			ArrayList<Roi> roiLabels=new ArrayList<>();
+			for(String keytemp:roiNameMap.keySet())
+				roiLabels.add(roiNameMap.get(keytemp));
+			
+		//	System.out.println(key);	
+			featureManager.uploadTrackTraining(key, roiLabels);
 			updateGui();
 		}//end if
 		
 		if(event.getActionCommand()== "DownloadButton"){	
 			String key=((Component)event.getSource()).getName();
+			
 			downloadRois(key);
 		}
 
 
 	}
 
+	
 	private void updateFrame() 
 	{
 		String key="Example";
@@ -682,7 +678,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 			listRoi.get(key).removeAll();	
 			listRoi.get(key).setListData(templistFrame);
-			listRoi.get(key).setForeground(Color.gray);
+			listRoi.get(key).setForeground(Color.BLACK);
 	}
 
 	/**
@@ -825,7 +821,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	    listRoi.get(key).removeAll();	
 	   // System.out.print(templist.firstElement());
 		listRoi.get(key).setListData(templist);
-		listRoi.get(key).setForeground(Color.gray);
+		listRoi.get(key).setForeground(Color.BLACK);
 		
 	}
 	
@@ -837,7 +833,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	    listRoi.get(key).removeAll();	
 	   // System.out.print(templist.firstElement());
 		listRoi.get(key).setListData(templistFrame);
-		listRoi.get(key).setForeground(Color.gray);
+		listRoi.get(key).setForeground(Color.BLACK);
 		
 		
 		
