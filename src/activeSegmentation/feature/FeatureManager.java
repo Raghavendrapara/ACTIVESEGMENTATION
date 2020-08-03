@@ -456,10 +456,14 @@ public class FeatureManager  {
 		projectManager.writeMetaInfo(projectInfo);
 	}
 
-	
+	public String getTrackPath()
+	{
+		return trackPath;
+	}
 	
 
 	public boolean uploadTrackTraining(String filename, List<Roi> rois) {
+		
 		String fileStoreAt=trackPath+"/"+filename+ASCommon.FORMAT;
 		//System.out.println(fileStoreAt);
 		DataOutputStream out = null;
@@ -486,6 +490,11 @@ public class FeatureManager  {
 		}
 		return true;
 	}
+	 public List<Roi> getTrackRoiLabel(String key)
+	 {
+		 List<Roi> templistRoi = openZip(key);
+		 return templistRoi;
+	 }
 	
 	public IDataSet extractFeatures(ProjectType featureType) {
        // System.out.println(featureType);

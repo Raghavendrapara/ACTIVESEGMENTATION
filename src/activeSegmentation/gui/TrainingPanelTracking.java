@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -110,6 +111,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	HashMap<String,Roi> roiNameMapAll=new HashMap<>();
 	HashMap<String,JList<String>> listRoi=new HashMap<>();
 	JList<String> list;
+	HashSet<String> roiAlreadyLabelled=new HashSet<>(); 
 	DefaultListModel<String> dl=new DefaultListModel<>();
 	/** Used only during classification setting*/
 	private Map<String,Integer> predictionResultClassification;
@@ -370,11 +372,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton.setName("ADD");
 		JButton upload= new JButton();
 		upload.setName(keynm);
-		//JButton download= new JButton();
-		//download.setName(key);
+		JButton download= new JButton();
+		download.setName(keynm);
 		addButton(addButton, "ADD", null, 855,280,350,250, buttonPanel, addbuttonAction, null);
 		addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
-		//addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
+		addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
 		roiPanel.add(buttonPanel);
 		String key=""+featureManager.getCurrentSlice();
 		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
@@ -428,19 +430,35 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		} // end if
 		
 		if(event== MITOSIS_BUTTON_PRESSED){
+			
+			featureManager.addtoManager(displayImage.getRoi());
+			if(roiAlreadyLabelled.contains(displayImage.getRoi().getName())) {
+				displayImage.killRoi();
+				featureManager.getRoiMan().reset();
+				JOptionPane.showMessageDialog(frame, "Already Labelled");
+			}
+			else {
 			featureManager.addMitosis();
 			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
-			featureManager.addtoManager(roi);
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
 			roiNameMap.put(key,roi );
 			templist.addElement(key);
 			resetRois();
 		    updateroiList(key1);
+		    }
 		} // end if
 		
 		
 		if(event== APOPTOSIS_BUTTON_PRESSED){
+
+			featureManager.addtoManager(displayImage.getRoi());
+			if(roiAlreadyLabelled.contains(displayImage.getRoi().getName())) {
+				displayImage.killRoi();
+				featureManager.getRoiMan().reset();
+				JOptionPane.showMessageDialog(frame, "Already Labelled");
+			}
+			else {
 			featureManager.addApoptosis();
 			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
@@ -450,10 +468,19 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			templist.addElement(key);
 			resetRois();
 		    updateroiList(key1);
+			}
 		} // end if
 		
 		
 		if(event== CLUSTERCOUNT_BUTTON_PRESSED){
+
+			featureManager.addtoManager(displayImage.getRoi());
+			if(roiAlreadyLabelled.contains(displayImage.getRoi().getName())) {
+				displayImage.killRoi();
+				featureManager.getRoiMan().reset();
+				JOptionPane.showMessageDialog(frame, "Already Labelled");
+			}
+			else {
 			String key1=((Component)event.getSource()).getName();
 			featureManager.addClusterCount();
 			Roi roi=displayImage.getRoi();
@@ -463,6 +490,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			templist.addElement(key);
             resetRois();
 			updateroiList(key1);
+			}
 		} // end if
 		
 		
@@ -628,6 +656,9 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}// end if
 		
 		if(event.getActionCommand()== "AddButton"){	
+			if(roiAlreadyLabelled.contains(displayImage.getRoi()))
+				JOptionPane.showMessageDialog(null, "Already Labelled");
+			else {
 			String key=((Component)event.getSource()).getName();
 			System.out.println(key);
 			Roi roi=displayImage.getRoi();
@@ -636,6 +667,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			templist.addElement(key1);
 			resetRois();
 			updateroiList(key);
+			}
 	
 			
 		} //end if
@@ -648,13 +680,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			
 		//	System.out.println(key);	
 			featureManager.uploadTrackTraining(key, roiLabels);
+			JOptionPane.showMessageDialog(null, "Succesfully Uploaded Labels");
 			updateGui();
 		}//end if
 		
 		if(event.getActionCommand()== "DownloadButton"){	
 			String key=((Component)event.getSource()).getName();
+			key=featureManager.getTrackPath()+"/"+key+ASCommon.FORMAT;
 			
-			downloadRois(key);
+			List<Roi> tempRoilist = featureManager.getTrackRoiLabel(key);
+			
+			for(Roi r:tempRoilist)
+				roiAlreadyLabelled.add(r.getName().trim());
+			JOptionPane.showMessageDialog(null, "Succesfully Downloaded Labels");
+			
 		}
 
 
