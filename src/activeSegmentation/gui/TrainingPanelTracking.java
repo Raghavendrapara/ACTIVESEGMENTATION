@@ -111,6 +111,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	HashMap<String,Roi> roiNameMapAll=new HashMap<>();
 	HashMap<String,JList<String>> listRoi=new HashMap<>();
 	JList<String> list;
+	JList<String> listCurrent;
 	HashSet<String> roiAlreadyLabelled=new HashSet<>(); 
 	DefaultListModel<String> dl=new DefaultListModel<>();
 	/** Used only during classification setting*/
@@ -146,7 +147,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private ImagePlus nxtImage;
 	/** Used only in classification setting, in segmentation we get from feature manager*/
 	//private ImagePlus tempClassifiedImage;
-	private JPanel imagePanel,classPanel,roiPanel;
+	private JPanel imagePanel,classPanel,roiPanel,currentRoiPanel;
 	private JTextField imageNum;
 	private JLabel total;
 	private List<JCheckBox> jCheckBoxList;
@@ -194,10 +195,10 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		panel.setFont(panelFONT);
 		panel.setBackground(Color.GRAY);
 		
-		imagePanel = new JPanel();	
-		roiPanel= new JPanel();
-		classPanel= new JPanel();
-		
+		imagePanel      = new JPanel();	
+		roiPanel        = new JPanel();
+		classPanel      = new JPanel();
+		currentRoiPanel = new JPanel();
 
 		/*
 		 * image panel
@@ -299,9 +300,15 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
 		scrollPane.setBounds(805,300,350,250);
 		panel.add(scrollPane);
-	    frame.add(panel);
+	    
 
-	
+	    currentRoiPanel.setBorder(BorderFactory.createTitledBorder("Current Frame ROIs"));
+		//roiPanel.setPreferredSize(new Dimension(350, 400));
+		JScrollPane scrollPaneCurrent = new JScrollPane(currentRoiPanel);
+		scrollPaneCurrent.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
+		scrollPaneCurrent.setBounds(805,600,250,200);
+		panel.add(scrollPaneCurrent);
+	    frame.add(panel);
 		/*
 		 *  frame code
 		 */
@@ -329,14 +336,18 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "MITOSIS",null , 800, 20, 130, 20,classPanel,MITOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
+		dl.addElement("                ");
         for(Roi rr:CurrentTrackFrameRoiList) {
 		dl.addElement(rr.getName());
 		roiNameMapAll.put(rr.getName(), rr);
         }
 		list=new JList<>(dl);
+		listCurrent=new JList<>(dl);
 		listRoi.put("Example",list);
-	    for(String key:listRoi.keySet())
-			addSidePanel(key);
+		listRoi.put("ExampleCurrent",listCurrent);
+	   
+			addSidePanel("Example");
+			addSidePanelCurrent("ExampleCurrent");
 	
 	}
     
@@ -386,7 +397,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 	}
 
+	private void addSidePanelCurrent(String keynm){
+		JPanel panel= new JPanel();
+		JList<String> current=GuiUtil.model();
 
+		current.setForeground(Color.WHITE);
+	
+	
+		String key=""+featureManager.getCurrentSlice();
+		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
+		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
+		listRoi.get(keynm).addMouseListener(mouseListener2);
+		currentRoiPanel.add(panel );
+		
+	}
 	private void addAction(JButton button ,final  ActionEvent action){
 		 button.addActionListener( new ActionListener()	{
 			@Override
@@ -702,7 +726,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	
 	private void updateFrame() 
 	{
-		String key="Example";
+		String key="ExampleCurrent";
 		
         displayImage.killRoi();
 			
@@ -715,6 +739,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	    templistFrame.addElement(rr.getName());
 	    roiNameMapAll.put(rr.getName(), rr);
 		}
+		
 			listRoi.get(key).removeAll();	
 			listRoi.get(key).setListData(templistFrame);
 			listRoi.get(key).setForeground(Color.BLACK);
@@ -868,7 +893,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	{
 		
 		
-		key="Example";
+		key="ExampleCurrent";
 	    listRoi.get(key).removeAll();	
 	   // System.out.print(templist.firstElement());
 		listRoi.get(key).setListData(templistFrame);
@@ -914,17 +939,6 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				if (index >= 0) {
 					String item =theList.getSelectedValue().toString();
 			
-					if(templistFrame.contains(item)) {
-			      //  System.out.println("ITEM : "+ item);
-				    templistFrame.remove(item);
-				    listRoi.get(key).removeAll();	
-					listRoi.get(key).setListData(templistFrame);
-					listRoi.get(key).setForeground(Color.BLACK);
-					updateroiFrameList(key);
-						updateGui();
-					
-					}
-				    else {
 				    	templist.remove(item);
 				    	listRoi.get(key).removeAll();	
 						listRoi.get(key).setListData(templist);
@@ -932,10 +946,43 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				        updateroiList(key);
 					updateGui();
 				}
-			}
+			
 		}
 	};
 	
+	private  MouseListener mouseListener2 = new MouseAdapter() {
+		public void mouseClicked(MouseEvent mouseEvent) {
+			JList<?>  theList = ( JList<?>) mouseEvent.getSource();
+			if (mouseEvent.getClickCount() == 1) {
+				int index = theList.getSelectedIndex();
+
+				if (index >= 0) {
+					String item =theList.getSelectedValue().toString();
+					
+					//System.out.println("Class Id"+ arr[0].trim());
+					//int sliceNum=Integer.parseInt(arr[2].trim());
+					showSelected( item);
+
+				}
+			}
+
+			if (mouseEvent.getClickCount() == 2) {
+				int index = theList.getSelectedIndex();
+				String key="ExampleCurrent";
+				if (index >= 0) {
+					String item =theList.getSelectedValue().toString();
+			
+				    	templistFrame.remove(item);
+				    	listRoi.get(key).removeAll();	
+						listRoi.get(key).setListData(templistFrame);
+						listRoi.get(key).setForeground(Color.BLACK);}
+				        updateroiFrameList(key);
+					updateGui();
+				}
+			
+		}
+	};
+
 	private void showSelected(String classKey ){
 		updateGui();
 
