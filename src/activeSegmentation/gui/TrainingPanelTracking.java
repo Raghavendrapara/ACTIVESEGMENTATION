@@ -7,9 +7,6 @@ import ij.gui.ImageWindow;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
-import ij.gui.Wand;
-import ij.io.RoiEncoder;
-import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 import ijaux.datatype.Pair;
@@ -22,30 +19,23 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -71,10 +61,7 @@ import activeSegmentation.LearningType;
 import activeSegmentation.ProjectType;
 import activeSegmentation.feature.FeatureManager;
 import activeSegmentation.feature.GroundTruthExtractor;
-import activeSegmentation.prj.ProjectManager;
 import activeSegmentation.util.GuiUtil;
-
-import static  activeSegmentation.ProjectType.*;
 
 public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
@@ -96,7 +83,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	byte[] red = new byte[ 256 ];
 	byte[] green = new byte[ 256 ];
 	byte[] blue = new byte[ 256 ];
-
+	HashMap<String, RoiListOverlay> roiOverlayList=new HashMap<String, RoiListOverlay>();
 	private Vector<String> templist=new Vector<>();
 	private Vector<String> templistFrame=new Vector<>();
 	public static final int  largeframeWidth=1200;
@@ -105,7 +92,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	public static final int IMAGE_CANVAS_DIMENSION = 700; //same width and height	
 
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
-	private Map<String,RoiListOverlay> roiOverlayList;
+	
 
 	HashMap<String,Roi> roiNameMap=new HashMap<>();
 	HashMap<String,Roi> roiNameMapAll=new HashMap<>();
@@ -128,20 +115,20 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	/** This {@link ActionEvent} is fired when the 'next' button is pressed. */
 	private ActionEvent NEXT_BUTTON_PRESSED = new ActionEvent( this, 0, "Next" );
-	/** This {@link ActionEvent} is fired when the 'previous' button is pressed. */
-	private ActionEvent PREVIOUS_BUTTON_PRESSED = new ActionEvent( this, 1, "Previous" );
-	private ActionEvent ADDCLASS_BUTTON_PRESSED = new ActionEvent( this, 2, "AddClass" );
-	private ActionEvent SAVECLASS_BUTTON_PRESSED= new ActionEvent( this, 3, "SaveLabel" );
-	private ActionEvent DELETE_BUTTON_PRESSED = new ActionEvent( this, 4, "DeleteClass" );
-	private ActionEvent COMPUTE_BUTTON_PRESSED  = new ActionEvent( this, 5, "TRAIN" );
-	private ActionEvent SAVE_BUTTON_PRESSED  = new ActionEvent( this, 6, "SAVEDATA" );
-	private ActionEvent TOGGLE_BUTTON_PRESSED = new ActionEvent( this, 7, "TOGGLE" );
-	private ActionEvent DOWNLOAD_BUTTON_PRESSED = new ActionEvent( this, 8, "DOWNLOAD" );
-	private ActionEvent MASKS_BUTTON_PRESSED = new ActionEvent( this, 9, "MASKS" );
-	private ActionEvent MITOSIS_BUTTON_PRESSED = new ActionEvent( this, 10, "MITOSIS" );
+	/** This {@link ActionEvent} is fired when  the 'previous' button is pressed. */
+	private ActionEvent PREVIOUS_BUTTON_PRESSED  = new ActionEvent( this, 1, "Previous" );
+	private ActionEvent ADDCLASS_BUTTON_PRESSED  = new ActionEvent( this, 2, "AddClass" );
+	private ActionEvent SAVECLASS_BUTTON_PRESSED = new ActionEvent( this, 3, "SaveLabel" );
+	private ActionEvent DELETE_BUTTON_PRESSED    = new ActionEvent( this, 4, "DeleteClass" );
+	private ActionEvent COMPUTE_BUTTON_PRESSED   = new ActionEvent( this, 5, "TRAIN" );
+	private ActionEvent SAVE_BUTTON_PRESSED      = new ActionEvent( this, 6, "SAVEDATA" );
+	private ActionEvent TOGGLE_BUTTON_PRESSED    = new ActionEvent( this, 7, "TOGGLE" );
+	private ActionEvent DOWNLOAD_BUTTON_PRESSED  = new ActionEvent( this, 8, "DOWNLOAD" );
+	private ActionEvent MASKS_BUTTON_PRESSED     = new ActionEvent( this, 9, "MASKS" );
+	private ActionEvent MITOSIS_BUTTON_PRESSED   = new ActionEvent( this, 10, "MITOSIS" );
 	private ActionEvent APOPTOSIS_BUTTON_PRESSED = new ActionEvent( this, 11, "APOPTOSIS" );
 	private ActionEvent CLUSTERCOUNT_BUTTON_PRESSED = new ActionEvent( this, 12, "CLUSTERCOUNT" );
-	private ActionEvent PROB_BUTTON_PRESSED = new ActionEvent( this, 13, "PROBABILITIES" );
+	private ActionEvent PROB_BUTTON_PRESSED      = new ActionEvent( this, 13, "PROBABILITIES" );
 	private ImagePlus displayImage;
 	private ImagePlus prvImage;
 	private ImagePlus nxtImage;
@@ -159,6 +146,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
     private JPanel prv;
     private ArrayList<Roi> CurrentTrackFrameRoiList;
     HashMap<Roi,Pair<Integer,String>> roiMap;
+    HashMap<String,Integer> eventCount=new HashMap<>();
 	/*
 	 * constructor 
 	 */
@@ -174,6 +162,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		this.setVisible(false);
 		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
 		featureManager.addMigration(CurrentTrackFrameRoiList.size());
+		
 		resetRois();
 		showPanel();
 	}
@@ -354,17 +343,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	/**
 	 * Draw the painted traces on the display image
 	 */
-	private void drawExamples(){
-		for(String key: featureManager.getClassKeys()){
-			ArrayList<Roi> rois=(ArrayList<Roi>) featureManager.
-					getExamples(key,learningType.getSelectedItem().toString(), featureManager.getCurrentSlice());
-			roiOverlayList.get(key).setColor(featureManager.getClassColor(key));
-			roiOverlayList.get(key).setRoi(rois);
-			//System.out.println("roi draw"+ key);
-		}
-
-		getImagePlus().updateAndDraw();
-	}
+	
 	private void addSidePanel(String keynm){
 		JPanel panel= new JPanel();
 		JList<String> current=GuiUtil.model();
@@ -462,7 +441,10 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				JOptionPane.showMessageDialog(frame, "Already Labelled");
 			}
 			else {
+				
 			featureManager.addMitosis();
+			eventCount.put("Mitosis",featureManager.getMitosis());
+			eventCount.put("Migration",featureManager.getMigration());
 			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
@@ -484,6 +466,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			}
 			else {
 			featureManager.addApoptosis();
+			eventCount.put("Apoptosis",featureManager.getApoptosis());
+			eventCount.put("Migration",featureManager.getMigration());
 			String key1=((Component)event.getSource()).getName();
 			Roi roi=displayImage.getRoi();
 			featureManager.addtoManager(roi);
@@ -507,6 +491,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			else {
 			String key1=((Component)event.getSource()).getName();
 			featureManager.addClusterCount();
+			eventCount.put("Cluster",featureManager.getClusterCount());
+			eventCount.put("Migration",featureManager.getMigration());
 			Roi roi=displayImage.getRoi();
 			featureManager.addtoManager(roi);
 			String key=featureManager.getCurrentSlice()+" "+roi.getName();
@@ -698,19 +684,57 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		if(event.getActionCommand()== "UploadButton"){	
 			String key=((Component)event.getSource()).getName();
+			String eventKey=key+"Event";
 			ArrayList<Roi> roiLabels=new ArrayList<>();
+			ArrayList<String> eventCountUpload=new ArrayList<>();
 			for(String keytemp:roiNameMap.keySet())
 				roiLabels.add(roiNameMap.get(keytemp));
 			
+			for(String keytemp:eventCount.keySet())
+				eventCountUpload.add(keytemp+" "+eventCount.get(keytemp));
 		//	System.out.println(key);	
 			featureManager.uploadTrackTraining(key, roiLabels);
+			featureManager.uploadTrackTrainingEvent(eventKey, eventCountUpload);
 			JOptionPane.showMessageDialog(null, "Succesfully Uploaded Labels");
 			updateGui();
 		}//end if
 		
 		if(event.getActionCommand()== "DownloadButton"){	
 			String key=((Component)event.getSource()).getName();
+			String eventKey=featureManager.getTrackPath()+"/"+key+"Event.txt";
 			key=featureManager.getTrackPath()+"/"+key+ASCommon.FORMAT;
+			
+			File file = new File(eventKey); 
+			  
+			  
+			try {
+				BufferedReader br;
+				br = new BufferedReader(new FileReader(file));
+				  String st; 
+				  while ((st = br.readLine()) != null) 
+				  {
+					  StringTokenizer temp=new StringTokenizer(st);
+					  String eventName=temp.nextToken().trim();
+					  String keyValue=temp.nextToken().trim();
+					  
+					  if(eventName.equals("Mitosis"))
+						  featureManager.setMitosis(Integer.valueOf(keyValue));
+					  else if(eventName.equals("Apoptosis"))
+						  featureManager.setApoptosis(Integer.valueOf(keyValue));
+					  else if(eventName.equals("Migration"))
+						  featureManager.setMigration(Integer.valueOf(keyValue));
+				      else if(eventName.equals("Cluster"))
+				    	  featureManager.setClusterCount(Integer.valueOf(keyValue));
+					  
+				  }
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			  
 			
 			List<Roi> tempRoilist = featureManager.getTrackRoiLabel(key);
 			
