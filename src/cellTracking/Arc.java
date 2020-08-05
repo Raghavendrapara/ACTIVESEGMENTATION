@@ -22,11 +22,16 @@ public class Arc {
 		return mEnd;
 	}
 	
+	void setScore(double score)
+	{
+	
+		this.score=score;	
+	}
 	double score()
 	{
-	return 1.0;	
+		
+		return score;
 	}
-	
 
 }
 

@@ -44,4 +44,12 @@ private TreeNode insert(TreeNode node, ImageIcon imgicon,String pos) {
 
  return(node); // in any case, return the new pointer to the caller
 }
+
+
+public static void main(String args[])
+{
+	
+	
+	
+}
 }

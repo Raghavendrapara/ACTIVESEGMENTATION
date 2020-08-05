@@ -3,6 +3,8 @@ package cellTracking;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ij.gui.Roi;
+
 
 public class Node {
 	int index;
@@ -10,10 +12,11 @@ public class Node {
 	ArrayList<Arc> backwardArc;
 	HashMap<Integer,String> id1=new HashMap<>();              //FeatureNames
 	HashMap<Integer,Double> id2=new HashMap<>();              //FeatureValues
-	
-	Node(int aIndex)
+	Roi roi;
+	Node(int aIndex,Roi roi)
 	{
 		index=aIndex;
+		this.roi=roi;
 	}
 	
 	
