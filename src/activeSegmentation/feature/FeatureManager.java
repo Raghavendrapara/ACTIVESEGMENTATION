@@ -350,6 +350,26 @@ public class FeatureManager  {
     	
     	return clustercnt;
      }
+	public void setMitosis(int mitocnt) {
+		
+		mitosiscnt = mitocnt;
+	}
+	
+    public void setApoptosis(int apopto) {
+		
+    	apoptosiscnt = apopto;
+	}
+    
+    public void setMigration(int mig){
+		
+    	migrationcnt = mig;
+	}
+
+    public void setClusterCount(int clusto) {
+	
+    	
+    	clustercnt = clusto;
+     }
     
 	public void addClass() {
 		String key = UUID.randomUUID().toString();
@@ -490,6 +510,37 @@ public class FeatureManager  {
 		}
 		return true;
 	}
+public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts) {
+		
+		String fileStoreAt=trackPath+"/"+filename+".txt";
+		//System.out.println(fileStoreAt);
+		
+		PrintWriter out;
+		try {
+			
+			out = new PrintWriter(fileStoreAt);
+			for(String temp:eventCnts)
+				out.println(temp);
+		        // Close the file.
+		        out.close(); 
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		
+		
+		
+		
+		
+		
+		return false;
+	
+		
+		
+		
+	}
+
 	 public List<Roi> getTrackRoiLabel(String key)
 	 {
 		 List<Roi> templistRoi = openZip(key);
