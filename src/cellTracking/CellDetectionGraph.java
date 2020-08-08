@@ -22,6 +22,7 @@ public class CellDetectionGraph {
 		detectionRois=new ArrayList<>();
 		imagePlusArray=images;
 		trellis=new Trellis(images.length);
+		
 	}
 	
 	private void createGraph()

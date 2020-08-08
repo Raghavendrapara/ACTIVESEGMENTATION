@@ -365,8 +365,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		JButton download= new JButton();
 		download.setName(keynm);
 		addButton(addButton, "ADD", null, 855,280,350,250, buttonPanel, addbuttonAction, null);
-		addButton(upload, null, uploadIcon, 805,280,350,250, buttonPanel, uploadAction, null);
-		addButton(download, null, downloadIcon, 805,280,350,250, buttonPanel, downloadAction, null);
+		addButton(upload, "SAVE", null, 805,280,350,250, buttonPanel, uploadAction, null);
+		addButton(download, "LOAD", null, 805,280,350,250, buttonPanel, downloadAction, null);
 		roiPanel.add(buttonPanel);
 		String key=""+featureManager.getCurrentSlice();
 		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
