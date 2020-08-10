@@ -6,7 +6,7 @@ public class Trellis
 	ArrayList<Arc> aArcs;
 	double aScore;
 // Default constructor used to make it possible to inherit from the class.
-   ArrayList<ArrayList<Node>> mNodes;//Layer number wise storage of Nodes for each tiff image 
+   ArrayList<ArrayList<Node>> mNodes=new ArrayList<>();//Layer number wise storage of Nodes for each tiff image 
 
    int mNumT;//No. Of tiff images/layers
 

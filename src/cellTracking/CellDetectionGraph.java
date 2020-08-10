@@ -39,27 +39,35 @@ public class CellDetectionGraph {
 		for(ImagePlus image:imagePlusArray)
 		{
 			
-			
+			//Uses GroundTruthExtractor Class for bit by bit extraction of ROIs for a ImagePlus Object 
 			ArrayList<Roi> tempRoiList = GroundTruthExtractor.runextracter(image,roiman, 1, 255, 0);
 			detectionRois.add(tempRoiList);
+			
+			//Iterate over Rois for the current Frame
 			for(Roi temp:tempRoiList)
 				trellis.addNode(aFrame,new Node(aNodePos++,temp));
 			aFrame++;
 		}
 		numOfRois=roiman.getRoisAsArray().length;
+		//trellis.highestScoringPath();
+		System.out.println(numOfRois);
+		//System.out.println(trellis.aScore);
 	}
 	
 	public static void main(String args[])
 	{
-        String inputPath="/home/raghavendra/Downloads/PhC-C2DH-U373/01_ST/SEG/"; 
+		//Currently a pre-decided path for main testing
+        String inputPath="/home/raghavendra/Downloads/PhC-C2DH-U373/01_GT/SEG/"; 
 		
 		GroundTruthExtractor extracter= new GroundTruthExtractor();
 		List<String> images=extracter.loadImages(inputPath);
 		ImagePlus iptemp[]=new ImagePlus[images.size()];
+		//Iterate over the Stack
 		for(int frameNum=0;frameNum<images.size();frameNum++) {
 		ImagePlus currentImage= IJ.openImage(inputPath+images.get(frameNum));	
 	    iptemp[frameNum] = currentImage;
 		}
+		//Initialize with the stack as ImagePlus Array
 		CellDetectionGraph cellDetGra=new CellDetectionGraph(iptemp);
 		cellDetGra.setDetections();
 		System.out.println(cellDetGra.detectionRois.size());
