@@ -20,6 +20,12 @@ public class Node {
 	}
 	
 	
+	public Node(int aIndex) {
+		// TODO Auto-generated constructor stub
+		index=aIndex;
+	}
+
+
 	void addForwardArc(Arc aArc)
 	{
 		if(this== aArc.getStart())
