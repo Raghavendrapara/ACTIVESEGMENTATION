@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Trellis
 {
-	ArrayList<Arc> aArcs;
+	ArrayList<Arc> aArcs=new ArrayList<>();
 	double aScore;
 // Default constructor used to make it possible to inherit from the class.
    ArrayList<ArrayList<Node>> mNodes=new ArrayList<>();//Layer number wise storage of Nodes for each tiff image 
@@ -46,15 +46,21 @@ public class Trellis
 	ArrayList<ArrayList<Integer>> prevIndex=new ArrayList<>();		
 
 	for (int t=0; t<mNumT; t++) 
-	{
-		bestArcs.add(new ArrayList<Arc>(mNodes.size()));
-		ArrayList<Double> tempScore=new ArrayList<Double>(mNodes.get(t).size());
-		ArrayList<Integer> tempPreviousIndex=new ArrayList<Integer>(mNodes.get(t).size());
+	{ 
+		ArrayList<Arc> bestArcsInit=new ArrayList<>();
 		
-		for(int i=0;i<tempScore.size();i++)
+		for(int initial=0;initial<mNodes.get(t).size();initial++)
+		bestArcsInit.add(null);
+		
+		bestArcs.add(bestArcsInit);
+		
+		ArrayList<Double> tempScore=new ArrayList<Double>();
+		ArrayList<Integer> tempPreviousIndex=new ArrayList<Integer>();
+		
+		for(int i=0;i<mNodes.get(t).size();i++)
 		    {
-			tempScore.set(i,-(Double.MAX_VALUE));
-			tempPreviousIndex.set(i, -1);
+			tempScore.add(-(Double.MAX_VALUE));
+			tempPreviousIndex.add(-1);
 	            }
 	        
 		bestScores.add(tempScore);
@@ -67,14 +73,18 @@ public class Trellis
         tempScoreAt0.add(n,0.0);
     }
     bestScores.set(0,tempScoreAt0);
+    
+    
+    
+    
 	// Go through the layers one by one to find the highest scoring path from the beginning of the Trellis to the end.
-    for (int t=1; t<mNumT; t++) 
+    for (int t=1; t<mNumT-1; t++) 
     {
         for (int n=0; n<mNodes.get(t).size(); n++)
 	{
              Node node = mNodes.get(t).get(n);
 		
-		for (int i=0; i<node.getNumOfForArcs(); i++) 
+		for (int i=0; i<node.getNumOfBackArcs(); i++) 
 		{
 			              Arc bArc     = node.getBackwardArc(i);
                           int pIndex   = bArc.getStart().getIndex();
@@ -83,17 +93,13 @@ public class Trellis
                           if (i==0 || score > bestScores.get(t).get(n))
                           {
                 	
-                          ArrayList<Arc> tempArc=bestArcs.get(t);
-                          tempArc.set(n,bArc);
-                          bestArcs.set(t,tempArc);
+                          
+                          bestArcs.get(t).set(n,bArc);
                     
-                          ArrayList<Double> tempScore=bestScores.get(t);
-                          tempScore.set(n,score);
-                          bestScores.set(t,tempScore);
+                          bestScores.get(t).set(n,score);
 
-                          ArrayList<Integer> tempPreviousPos=prevIndex.get(t);
-                          tempPreviousPos.set(n,pIndex);
-                          prevIndex.set(t,tempPreviousPos);
+                         
+                          prevIndex.get(t).set(n,pIndex);
          
 		          }
                 }

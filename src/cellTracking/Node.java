@@ -8,8 +8,8 @@ import ij.gui.Roi;
 
 public class Node {
 	int index;
-	ArrayList<Arc> forwardArc;
-	ArrayList<Arc> backwardArc;
+	ArrayList<Arc> forwardArc=new ArrayList<>();
+	ArrayList<Arc> backwardArc=new ArrayList<>();
 	HashMap<Integer,String> id1=new HashMap<>();              //FeatureNames
 	HashMap<Integer,Double> id2=new HashMap<>();              //FeatureValues
 	Roi roi;
@@ -35,9 +35,10 @@ public class Node {
 	}
 	void addBackwardArc(Arc aArc)
 	{
-		if(this == aArc.getEnd())
+		if(aArc!=null)
+		{
 			backwardArc.add(aArc);
-      		
+		}	
 	}
 	int getNumOfBackArcs()
 	{

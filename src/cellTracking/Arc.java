@@ -30,7 +30,7 @@ public class Arc {
 	double score()
 	{
 		
-		return score;
+		return Math.log(Math.random());
 	}
 
 }

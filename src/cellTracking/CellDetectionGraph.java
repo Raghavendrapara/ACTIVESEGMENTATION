@@ -27,7 +27,7 @@ public class CellDetectionGraph {
 	
 	private void createGraph()
 	{
-		
+		trellis.highestScoringPath();
 		
 	}
 	
@@ -45,8 +45,23 @@ public class CellDetectionGraph {
 			
 			//Iterate over Rois for the current Frame
 			for(Roi temp:tempRoiList)
+			{
 				trellis.addNode(aFrame,new Node(aNodePos++,temp));
+			}
+			aNodePos=0;
+			
+			if(aFrame>0)
+			{
+				for(Node backs:trellis.mNodes.get(aFrame-1))
+				{
+					for(Node curr:trellis.mNodes.get(aFrame))
+					{
+						curr.addBackwardArc(new Arc(backs,curr));
+					}
+				}
+			}
 			aFrame++;
+			
 		}
 		numOfRois=roiman.getRoisAsArray().length;
 		//trellis.highestScoringPath();
@@ -71,5 +86,7 @@ public class CellDetectionGraph {
 		CellDetectionGraph cellDetGra=new CellDetectionGraph(iptemp);
 		cellDetGra.setDetections();
 		System.out.println(cellDetGra.detectionRois.size());
+		cellDetGra.createGraph();
+
 	}
 }
