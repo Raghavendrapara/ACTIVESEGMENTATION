@@ -42,9 +42,11 @@ public class Arc {
 		double x2= centroidEnd[0];
 		double y1= centroidStart[1];
 		double y2= centroidEnd[1];
-		double dis=Math.sqrt(Math.abs( ( (x2-x1)*(x2-x1)-(y2-y1)*(y2-y1) ) ));
-	//	System.out.println(dis);
-		return Math.log(1/dis);
+		double dis=Math.sqrt(Math.abs( ( (x2-x1)*(x2-x1)+(y2-y1)*(y2-y1) ) ));
+		
+		double normal=Math.pow(1.1,dis);
+	//	System.out.println(normal);
+		return Math.log(1/normal);
 	}
 
 }
