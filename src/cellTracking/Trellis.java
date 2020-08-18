@@ -24,9 +24,7 @@ public class Trellis
    void addNode(int aT, Node aNode) //aT denotes position of the image in tiff stack 
    {
 	
-	   ArrayList<Node> arr=mNodes.get(aT);
-	   arr.add(aNode);
-	   mNodes.set(aT,arr);
+	   mNodes.get(aT).add(aNode);
 	   
    }
 
@@ -37,7 +35,8 @@ public class Trellis
    }
 
 
-   void highestScoringPath() //Implementation of the pseudo code for Viterbi Algorithm
+   //Viterbi Algorithm Part
+   ArrayList<ArrayList<Arc>> highestScoringPath() //Implementation of the pseudo code for Viterbi Algorithm
 
    {
 
@@ -70,7 +69,7 @@ public class Trellis
 	// Set the initial scores to 0.
 	ArrayList<Double> tempScoreAt0=bestScores.get(0);
 	for (int n=0; n<mNodes.get(0).size(); n++) {
-        tempScoreAt0.add(n,0.0);
+        tempScoreAt0.set(n,0.0);
     }
     bestScores.set(0,tempScoreAt0);
     
@@ -78,7 +77,7 @@ public class Trellis
     
     
 	// Go through the layers one by one to find the highest scoring path from the beginning of the Trellis to the end.
-    for (int t=1; t<mNumT-1; t++) 
+    for (int t=1; t<mNumT; t++) 
     {
         for (int n=0; n<mNodes.get(t).size(); n++)
 	{
@@ -88,7 +87,7 @@ public class Trellis
 		{
 			              Arc bArc     = node.getBackwardArc(i);
                           int pIndex   = bArc.getStart().getIndex();
-                          double score = bestScores.get(t-1).get(pIndex) + bArc.score();
+                          double score = bestScores.get(t-1).get(pIndex) + bArc.getMigscore();
                           
                           if (i==0 || score > bestScores.get(t).get(n))
                           {
@@ -120,10 +119,12 @@ public class Trellis
         {
 	    aArcs.add(bestArcs.get(t).get(maxIndex));
         maxIndex = prevIndex.get(t).get(maxIndex);
+        System.out.println(maxIndex);
         }
 
 	// Set output score.
     aScore = bestScores.get(mNumT-1).get(endIndex);
+	return bestArcs;
 
 	//To Delete temporary lists
 	

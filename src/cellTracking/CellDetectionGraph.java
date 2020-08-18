@@ -16,6 +16,7 @@ public class CellDetectionGraph {
 	private ImagePlus imagePlusArray[];
 	private int numOfRois;
 	private Trellis trellis;
+	ArrayList<ArrayList<Arc>> track;
 	CellDetectionGraph(ImagePlus images[])
 	{
 	
@@ -27,28 +28,29 @@ public class CellDetectionGraph {
 	
 	private void createGraph()
 	{
-		trellis.highestScoringPath();
+		track=trellis.highestScoringPath();
 		
 	}
 	
 	private void setDetections()
 	{
 		System.out.println(imagePlusArray.length);
-		int aFrame=0,aNodePos=0;
+		int aFrame=0;
 		RoiManager roiman=new RoiManager();
 		for(ImagePlus image:imagePlusArray)
 		{
+			int aNodePos=0;
 			
 			//Uses GroundTruthExtractor Class for bit by bit extraction of ROIs for a ImagePlus Object 
 			ArrayList<Roi> tempRoiList = GroundTruthExtractor.runextracter(image,roiman, 1, 255, 0);
 			detectionRois.add(tempRoiList);
-			
+			System.out.println(tempRoiList.size());
 			//Iterate over Rois for the current Frame
 			for(Roi temp:tempRoiList)
 			{
 				trellis.addNode(aFrame,new Node(aNodePos++,temp));
 			}
-			aNodePos=0;
+		
 			
 			if(aFrame>0)
 			{
@@ -87,6 +89,7 @@ public class CellDetectionGraph {
 		cellDetGra.setDetections();
 		System.out.println(cellDetGra.detectionRois.size());
 		cellDetGra.createGraph();
+		System.out.println("Done");
 
 	}
 }

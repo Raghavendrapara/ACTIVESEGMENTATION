@@ -180,7 +180,9 @@ public class GroundTruthExtractor {
 		for(Roi rr:r)
 		listroi.add(rr);
 		currentImage.killRoi();
+		roiManager.reset();
 		return listroi;
+		
 		
 	}
 	
