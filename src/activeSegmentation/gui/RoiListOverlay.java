@@ -111,6 +111,12 @@ public class RoiListOverlay implements Overlay
 		this.roi = roi;
 	}
 	
+	public void setRoi(Roi roi)
+	{
+		ArrayList<Roi> temp=new ArrayList<>();
+		temp.add(roi);
+		this.roi=temp;
+	}
 	public void setComposite (Composite composite)
 	{this.composite = composite;}
 	

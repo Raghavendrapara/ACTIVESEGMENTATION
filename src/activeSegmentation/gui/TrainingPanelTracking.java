@@ -2,6 +2,7 @@ package activeSegmentation.gui;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
 import ij.gui.Overlay;
@@ -30,10 +31,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.swing.BorderFactory;
@@ -62,6 +65,7 @@ import activeSegmentation.ProjectType;
 import activeSegmentation.feature.FeatureManager;
 import activeSegmentation.feature.GroundTruthExtractor;
 import activeSegmentation.util.GuiUtil;
+import cellTracking.CellDetectionGraph;
 
 public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
@@ -78,12 +82,13 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	LUT overlayLUT;
 	/** flag to display the overlay image */
 	private boolean showColorOverlay=false;
+	private Random rand=new Random();
 	ImagePlus classifiedImage;
 	// Create overlay LUT
 	byte[] red = new byte[ 256 ];
 	byte[] green = new byte[ 256 ];
 	byte[] blue = new byte[ 256 ];
-	HashMap<String, RoiListOverlay> roiOverlayList=new HashMap<String, RoiListOverlay>();
+	HashMap<Integer, RoiListOverlay> roiOverlayList=new HashMap<Integer, RoiListOverlay>();
 	private Vector<String> templist=new Vector<>();
 	private Vector<String> templistFrame=new Vector<>();
 	public static final int  largeframeWidth=1200;
@@ -147,6 +152,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
     private ArrayList<Roi> CurrentTrackFrameRoiList;
     HashMap<Roi,Pair<Integer,String>> roiMap;
     HashMap<String,Integer> eventCount=new HashMap<>();
+    private List<Color> defaultColors;
 	/*
 	 * constructor 
 	 */
@@ -156,8 +162,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		this.displayImage= featureManager.getCurrentImage();
 		this.jCheckBoxList= new ArrayList<JCheckBox>();
 		this.jTextList= new HashMap<String,JTextArea>();
-		
-		roiOverlayList = new HashMap<String, RoiListOverlay>();
+		this.defaultColors = GuiUtil.setDefaultColors();
+		roiOverlayList = new HashMap<Integer, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
 		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
@@ -287,7 +293,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		//roiPanel.setPreferredSize(new Dimension(350, 400));
 		JScrollPane scrollPane = new JScrollPane(roiPanel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
-		scrollPane.setBounds(805,300,350,250);
+		scrollPane.setBounds(805,300,350,200);
 		panel.add(scrollPane);
 	    
 
@@ -683,6 +689,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		} //end if
 		
 		if(event.getActionCommand()== "UploadButton"){	
+			CellDetectionGraph cell=new CellDetectionGraph(featureManager.getRoiMan(),featureManager);
+			ArrayList<ArrayList<Roi>> arr=cell.runTrack();
+			featureManager.setTrackSet(arr);
+			drawExamples();
+			
 			String key=((Component)event.getSource()).getName();
 			String eventKey=key+"Event";
 			ArrayList<Roi> roiLabels=new ArrayList<>();
@@ -747,11 +758,92 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	}
 
+	private void drawExamples(){
+		ArrayList<ImagePlus> disp;
+		disp=featureManager.getImageList();
+		ImageStack is=new ImageStack(disp.get(0).getWidth(), disp.get(0).getHeight());
+		int in=0;
+			for(ImagePlus ip:disp) {
+				is.addSlice(ip.getProcessor());
+			}
+		for(int key=1;key<=15;key++)
+		{	
+			
+			RoiListOverlay roiOverlay = new RoiListOverlay();
+		roiOverlay.setComposite( transparency050 );
+		((OverlayedImageCanvas)ic).addOverlay(roiOverlay);
+		roiOverlayList.put(key,roiOverlay);
+	}
+		int key=1;
+		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
+			Collections.reverse(rois);
+			roiOverlayList.get(key).setColor(getColor(key));
+			roiOverlayList.get(key).setRoi(rois);
+			key++;
+			
+			for(Roi r:rois)
+			featureManager.getRoiMan().addRoi(r);
+			//System.out.println("roi draw"+ key);
+		}
+		
+//	ImageStack is=getImagePlus().getImageStack();
+	/*
+	int key1=1;
+	  for(ArrayList<Roi> rois:featureManager.getTrackSet()) {
+		Color col=getColor(key1);
+		int index=0;
+		for(Roi r:rois) {
+			
+	    disp.get(index).setOverlay(r,col , 1, col);
+        index++;
+		
+		}
+		key1++;
+	}
+	  */
+
+	ImagePlus imagePlus=new ImagePlus("TrackedStack",is);
+	imagePlus.show();
+	imagePlus.updateAndDraw();
+	getImagePlus().updateAndRepaintWindow();
+	getImagePlus().updateAndDraw();
+	}
+	private void drawExample()	{
+		
+		int key=1;
+		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
+			Collections.reverse(rois);
+			roiOverlayList.get(key).setColor(getColor(key));
+			roiOverlayList.get(key).setRoi(rois.get(featureManager.getCurrentSlice()-1));
+			key++;
+			
+		//	for(Roi r:rois)
+		//	featureManager.getRoiMan().addRoi(r);
+			//System.out.println("roi draw"+ key);
+		}
+		getImagePlus().updateAndRepaintWindow();
+		getImagePlus().updateAndDraw();
+		}
+	private Color getColor(int number) {
+		
+		if(number<defaultColors.size())
+			return defaultColors.get(number);
+					
+		
+			float r = rand.nextFloat();
+			float g = rand.nextFloat();
+			float b = rand.nextFloat();
+			Color randomColor = new Color(r, g, b);
+			defaultColors.add(randomColor);
+			return randomColor;
+		
+
+	}
 	
 	private void updateFrame() 
 	{
 		String key="ExampleCurrent";
-		
+		drawExample();
         displayImage.killRoi();
 			
 		featureManager.getRoiMan().reset();
@@ -863,7 +955,9 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		try{
 			
 			//updateallExampleLists();
+			
 			ic.setMinimumSize(new Dimension(IMAGE_CANVAS_DIMENSION, IMAGE_CANVAS_DIMENSION));
+			
 			ic.repaint();
 		
 			

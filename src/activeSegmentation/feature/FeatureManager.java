@@ -80,7 +80,8 @@ public class FeatureManager  {
 	private Map<String,Integer> predictionResultClassification;
     private int mitosiscnt,apoptosiscnt,clustercnt,migrationcnt;
     private ImageProcessor TrackTrainProcessor;
-    
+    private ArrayList<ArrayList<Roi>> trackSet;
+    private List<Color> trackColor;
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
 		this.projectManager = projectManager;
 		this.learningManager=learningManager;
@@ -96,6 +97,7 @@ public class FeatureManager  {
 		this.clustercnt=0;
 		this.migrationcnt=0;
 		this.defaultColors = GuiUtil.setDefaultColors();
+		setTrackColor(new ArrayList<>());
 		if (this.totalSlices > 0) {
 			this.sliceNum = 1;
 		}
@@ -391,6 +393,7 @@ public class FeatureManager  {
 			float g = rand.nextFloat();
 			float b = rand.nextFloat();
 			Color randomColor = new Color(r, g, b);
+			defaultColors.add(randomColor);
 			return randomColor;
 		}
 
@@ -854,7 +857,25 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		
 			return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
-
+	
+	public ArrayList<ImagePlus> getImageList(){
+		
+		ArrayList<ImagePlus> litImags=new ArrayList<ImagePlus>();
+		
+		for(int ind=0;ind<getTotalSlice();ind++)
+		{
+			IJ.log(projectString + this.images.get(ind));
+			ImagePlus img=IJ.openImage(projectString + this.images.get(ind));
+			litImags.add(img);
+			
+		}
+		
+		
+		return litImags;
+                                
+		
+		
+	}
 	private ImagePlus createImageIcon(String path) {
 		java.net.URL imgURL = FeatureManager.class.getResource(path);
 		if (imgURL != null) {
@@ -883,4 +904,20 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		return TrackTrainProcessor;
 	}
 
+	public ArrayList<ArrayList<Roi>> getTrackSet() {
+		return trackSet;
+	}
+
+	public void setTrackSet(ArrayList<ArrayList<Roi>> trackSet) {
+		this.trackSet = trackSet;
+	}
+
+	public Color getTrackColor(int key) {
+		return trackColor.get(key);
+	}
+
+	public void setTrackColor(List<Color> trackColor) {
+		this.trackColor = trackColor;
+	}
+	
 }
