@@ -4,6 +4,7 @@ import java.util.*;
 public class Trellis
 {
 	ArrayList<Arc> aArcs=new ArrayList<>();
+	ArrayList<ArrayList<Arc>> tracks=new ArrayList<>();
 	double aScore;
 // Default constructor used to make it possible to inherit from the class.
    ArrayList<ArrayList<Node>> mNodes=new ArrayList<>();//Layer number wise storage of Nodes for each tiff image 
@@ -104,10 +105,15 @@ public class Trellis
                 }
         }
     }
+    HashSet<Integer> visited=new HashSet<>();
     //BackTracking
+    while(bestScores.get(mNumT-1).size()!=visited.size()){
    	int endIndex = 0;
+   	while(bestScores.get(mNumT-1).get(endIndex)==null) {
+   		endIndex++;}
 	for (int n=0; n<mNodes.get(mNumT-1).size();n++)
 	{
+		if(!visited.contains(n) && !visited.contains(endIndex))
 		if (bestScores.get(mNumT-1).get(n) > bestScores.get(mNumT-1).get(endIndex)) 
 		{
 			endIndex = n;
@@ -115,16 +121,21 @@ public class Trellis
 	}
 
 	int maxIndex = endIndex;
-        for (int t=mNumT-1; t>0; t--)
+        for (int t=mNumT-1; t>=0; t--)
         {
 	    aArcs.add(bestArcs.get(t).get(maxIndex));
         maxIndex = prevIndex.get(t).get(maxIndex);
-        System.out.println(maxIndex);
+     //   System.out.println(maxIndex);
         }
+        bestScores.get(mNumT-1).set(endIndex,null);
+        visited.add(endIndex);
+tracks.add(aArcs);
+aArcs=new ArrayList<>();
+   }
 
 	// Set output score.
-    aScore = bestScores.get(mNumT-1).get(endIndex);
-	return bestArcs;
+   
+	return tracks;
 
 	//To Delete temporary lists
 	

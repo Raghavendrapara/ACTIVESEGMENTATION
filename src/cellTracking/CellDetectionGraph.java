@@ -3,6 +3,7 @@ package cellTracking;
 import java.util.ArrayList;
 import java.util.List;
 
+import activeSegmentation.feature.FeatureManager;
 import activeSegmentation.feature.GroundTruthExtractor;
 import ij.IJ;
 import ij.ImagePlus;
@@ -12,31 +13,46 @@ import ij.plugin.frame.RoiManager;
 
 public class CellDetectionGraph {
 	
-	private ArrayList<ArrayList<Roi>> detectionRois;
+	private ArrayList<ArrayList<Roi>> detectionRois=new ArrayList<>();;
 	private ImagePlus imagePlusArray[];
 	private int numOfRois;
 	private Trellis trellis;
-	ArrayList<ArrayList<Arc>> track;
-	CellDetectionGraph(ImagePlus images[])
-	{
+	private ArrayList<ArrayList<Arc>> track;
+	private FeatureManager featureMan;
+	private RoiManager roiman;
 	
-		detectionRois=new ArrayList<>();
-		imagePlusArray=images;
-		trellis=new Trellis(images.length);
-		
+	public CellDetectionGraph(RoiManager roiman,FeatureManager featureman)
+	{
+		 ArrayList<ImagePlus> imageList=featureman.getImageList(); 
+			
+			//GroundTruthExtractor extracter= new GroundTruthExtractor();
+			//List<String> images=extracter.loadImages(inputPath);
+			ImagePlus iptemp[]=new ImagePlus[imageList.size()];
+			//Iterate over the Stack
+			for(int frameNum=0;frameNum<imageList.size();frameNum++) {
+			//ImagePlus currentImage= IJ.openImage(inputPath+images.get(frameNum));	
+		    iptemp[frameNum] = imageList.get(frameNum);
+			}
+			imagePlusArray=iptemp;
+		trellis=new Trellis(imagePlusArray.length);
+		this.roiman=roiman;
+		setFeatureMan(featureman);
 	}
+	
+	
 	
 	private void createGraph()
 	{
 		track=trellis.highestScoringPath();
+       
 		
 	}
 	
 	private void setDetections()
 	{
-		System.out.println(imagePlusArray.length);
+		//System.out.println(imagePlusArray.length);
 		int aFrame=0;
-		RoiManager roiman=new RoiManager();
+	//	RoiManager roiman=new RoiManager();
 		for(ImagePlus image:imagePlusArray)
 		{
 			int aNodePos=0;
@@ -67,29 +83,44 @@ public class CellDetectionGraph {
 		}
 		numOfRois=roiman.getRoisAsArray().length;
 		//trellis.highestScoringPath();
-		System.out.println(numOfRois);
+		//System.out.println(numOfRois);
 		//System.out.println(trellis.aScore);
 	}
 	
-	public static void main(String args[])
+	public ArrayList<ArrayList<Roi>> runTrack()
 	{
 		//Currently a pre-decided path for main testing
-        String inputPath="/home/raghavendra/Downloads/PhC-C2DH-U373/01_GT/SEG/"; 
-		
-		GroundTruthExtractor extracter= new GroundTruthExtractor();
-		List<String> images=extracter.loadImages(inputPath);
-		ImagePlus iptemp[]=new ImagePlus[images.size()];
-		//Iterate over the Stack
-		for(int frameNum=0;frameNum<images.size();frameNum++) {
-		ImagePlus currentImage= IJ.openImage(inputPath+images.get(frameNum));	
-	    iptemp[frameNum] = currentImage;
-		}
+        
 		//Initialize with the stack as ImagePlus Array
-		CellDetectionGraph cellDetGra=new CellDetectionGraph(iptemp);
-		cellDetGra.setDetections();
-		System.out.println(cellDetGra.detectionRois.size());
-		cellDetGra.createGraph();
-		System.out.println("Done");
+		//CellDetectionGraph cellDetGra=new CellDetectionGraph(iptemp);
+		this.setDetections();
+		//System.out.println(this.detectionRois.size());
+		this.createGraph();
+		ArrayList<ArrayList<Roi>> trackRois=new ArrayList<>();
+		for(ArrayList<Arc> tempArcs:this.track)
+		{
+			ArrayList<Roi> tempNodes=new ArrayList<>();
+			for(Arc arc:tempArcs)
+			{
+				if(arc!=null)
+				{
+					tempNodes.add(arc.getStart().roi);
+				}
+			}
+			trackRois.add(tempNodes);
+		}
+		
+		IJ.log("Done");
+		featureMan.setTrackSet(trackRois);
+		return trackRois;
 
+	}
+
+	public FeatureManager getFeatureMan() {
+		return featureMan;
+	}
+
+	public void setFeatureMan(FeatureManager featureMan) {
+		this.featureMan = featureMan;
 	}
 }
