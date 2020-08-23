@@ -162,7 +162,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		this.displayImage= featureManager.getCurrentImage();
 		this.jCheckBoxList= new ArrayList<JCheckBox>();
 		this.jTextList= new HashMap<String,JTextArea>();
-		this.defaultColors = GuiUtil.setDefaultColors();
+		this.defaultColors = new ArrayList<>();
 		roiOverlayList = new HashMap<Integer, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
@@ -777,12 +777,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		int key=1;
 		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
 			Collections.reverse(rois);
-			roiOverlayList.get(key).setColor(getColor(key));
-			roiOverlayList.get(key).setRoi(rois);
+	//		roiOverlayList.get(key).setColor(getColor(key));
+	//		roiOverlayList.get(key).setRoi(rois);
 			key++;
 			
-			for(Roi r:rois)
-			featureManager.getRoiMan().addRoi(r);
+		//	for(Roi r:rois)
+		//	featureManager.getRoiMan().addRoi(r);
 			//System.out.println("roi draw"+ key);
 		}
 		
@@ -812,7 +812,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		int key=1;
 		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
-			Collections.reverse(rois);
+		//	Collections.reverse(rois);
 			roiOverlayList.get(key).setColor(getColor(key));
 			roiOverlayList.get(key).setRoi(rois.get(featureManager.getCurrentSlice()-1));
 			key++;
