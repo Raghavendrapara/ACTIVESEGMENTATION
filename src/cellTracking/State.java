@@ -98,5 +98,14 @@ public class State extends Node {
 
 		// Updates counters to reflect that the algorithm goes throught the state one mote time.
 		 void Plus() { ; }
+
+
+		public int getFrame() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+
+		
 	}
 

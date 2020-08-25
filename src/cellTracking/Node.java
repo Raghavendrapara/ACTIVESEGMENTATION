@@ -13,6 +13,7 @@ public class Node {
 	HashMap<Integer,String> id1=new HashMap<>();              //FeatureNames
 	HashMap<Integer,Double> id2=new HashMap<>();              //FeatureValues
 	Roi roi;
+	public boolean hasChildren;
 	Node(int aIndex,Roi roi)
 	{
 		index=aIndex;
@@ -61,6 +62,52 @@ public class Node {
 	{
 		return backwardArc.get(indx);
 	}
+
+
+	public Object getNextEvent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public Object getPrevCell() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public Node getChild(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public boolean hasNextCell() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+	public boolean hasChildren() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	public State getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public Node getNextCell() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	
 	
 	
 /*	void getFeatureMap(int i,int j) throws IOException

@@ -1,6 +1,7 @@
 package cellTracking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TrackTree {
 	
@@ -39,7 +40,88 @@ public class TrackTree {
      	return newCell;
 	
         }
-   /*     
+        
+        void getCells(double aCellA[][], double aDivA[][], double aDeathA[]) {
+
+        	HashMap<Node,Integer> cellIndices=new HashMap<>();
+        	int mapIndex = 0;  
+        	for (CellIterator cIt = getBeginFirstCell(); cIt!=getEndFirstCell(); ) {
+        		cellIndices.put(cIt.getNode(), mapIndex);
+        		mapIndex++;
+        	}
+
+        	// Initialize with  0.
+        	for (int t=0; t<stackSize; t++) {
+        		for (int c=0; c<getNumCells(); c++) {
+        			aCellA[t][c] = 0;
+        		}
+        	}
+        	for (int c=0; c<getNumCells(); c++) {
+        		for (int i=0; i<2; i++) {
+        			aDivA[c][i] = 0;
+        		}
+        	}
+            for (int c=0; c<getNumCells(); c++) {
+                aDeathA[c] = 0;
+            }
+
+        	int cIndex = 0;
+        	for (CellIterator cIt = getBeginFirstCell(); cIt!=getEndFirstCell(); ) {
+        		Node cell = cIt.getNode();
+
+        		cell = cell.getNextCell();  
+
+        		// Write track to aCellA.
+        		while (true) {
+        			State state = cell.getState();
+        			aCellA[state.getFrame()-1][cIndex] = state.getIndex() + 1;
+        			
+        			Node nextCell = cell.getNextCell();
+        			if (cell.hasChildren() || (!nextCell.hasNextCell() && !nextCell.hasChildren())) {
+        				break;
+        			}
+        			cell = nextCell;
+        		}
+
+        		// Write Mitosis information to aDivA.
+        		if (cell.hasChildren) {
+        			Node cell1 = cell.getChild(0);
+        			Node cell2 = cell.getChild(1);
+        			aDivA[cIndex][0] = cellIndices.get(cell1.getPrevCell()) + 1;
+        			aDivA[cIndex][1] = cellIndices.get(cell2.getPrevCell()) + 1;
+        		}
+                
+                // Write a 1 to aDeathA if the cell dies.
+                if ( cell.getNextEvent() != null) {
+                    aDeathA[cIndex] = 1.0;
+                } 
+
+        		cIndex++;
+        	}
+        }
+        
+   private int getNumCells() {
+			// TODO Auto-generated method stub
+			return trackStartingCells.size();
+		}
+
+
+
+private CellIterator getEndFirstCell() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+
+
+private CellIterator getBeginFirstCell() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+
+
+		/*     
         void getIterations(double aIterationA) {
 
         	// Fill the matrix with -1.
