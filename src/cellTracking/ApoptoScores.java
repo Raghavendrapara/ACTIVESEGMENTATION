@@ -1,15 +1,15 @@
-package cellTracking.eventScores;
+package cellTracking;
 
 import java.util.ArrayList;
 
 import ij.gui.Roi;
 
-//Computes scores for migration events in cells/blobs of an image sequence.
+//Computes scores for death events in cells/blobs of an image sequence.
 
-public class MigScores {
+public class ApoptoScores {
 	
 	
-	// The scores are log-probabilities of migration events.
+	// The scores are log-probabilities of death events.
 	
 	
 	    /* 
@@ -25,7 +25,7 @@ public class MigScores {
 	     Log-probability that at least one death event takes place in the detection.
 	    
 	    */
-	private double migMat[][];
+	private double deathMat[][];
 	
 	
 	private double death; //Calculated from Training on Event Histogram
@@ -38,5 +38,31 @@ public class MigScores {
 	public void setDetectionRoi()
 	{
 		
+	}
+	public double[][] getDeathprob(){
+		
+	        if(death==0)
+	        return deathMat;
+	   
+	       // There is no need to find death scores in the last frame.
+	        int k=0;//Counter for a detection Roi
+            for(int frameNum=0;frameNum<detections.size()-1;frameNum++)
+	        for(int detection=0;detection<detections.get(frameNum).size();detection++)
+	        {
+	    	deathMat[k][0]   = frameNum;
+		    deathMat[k][1]   = detection;
+		    deathMat[k][2]	 = Math.max(Math.log(death),-100000);			
+		    deathMat[k][3]   = Math.max(Math.log(1-death),-100000);
+		    k+=1;
+	        }
+            
+    return deathMat;
+	
+	}
+	
+	public void setDeathProb(double deathProb)
+	{
+		
+		death=deathProb;
 	}
 }
