@@ -153,6 +153,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
     HashMap<Roi,Pair<Integer,String>> roiMap;
     HashMap<String,Integer> eventCount=new HashMap<>();
     private List<Color> defaultColors;
+	private int flagTrack;
 	/*
 	 * constructor 
 	 */
@@ -364,15 +365,19 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		ActionEvent addbuttonAction= new ActionEvent(buttonPanel, 1,"AddButton");
 		ActionEvent uploadAction= new ActionEvent(buttonPanel, 2,"UploadButton");
 		ActionEvent downloadAction= new ActionEvent(buttonPanel, 3,"DownloadButton");
+		ActionEvent trackAction= new ActionEvent(buttonPanel, 4,"TrackButton");
 		JButton addButton= new JButton();
 		addButton.setName("ADD");
 		JButton upload= new JButton();
 		upload.setName(keynm);
 		JButton download= new JButton();
 		download.setName(keynm);
-		addButton(addButton, "ADD", null, 855,280,350,250, buttonPanel, addbuttonAction, null);
+		JButton track= new JButton();
+		track.setName(keynm);
+		addButton(addButton, "ADD", null, 805,280,350,250, buttonPanel, addbuttonAction, null);
 		addButton(upload, "SAVE", null, 805,280,350,250, buttonPanel, uploadAction, null);
 		addButton(download, "LOAD", null, 805,280,350,250, buttonPanel, downloadAction, null);
+		addButton(track, "TRACK", null, 805,280,350,250, buttonPanel, trackAction, null);
 		roiPanel.add(buttonPanel);
 		String key=""+featureManager.getCurrentSlice();
 		panel.add(GuiUtil.addScrollPanel(listRoi.get(keynm),null));
@@ -689,11 +694,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		} //end if
 		
 		if(event.getActionCommand()== "UploadButton"){	
-			CellDetectionGraph cell=new CellDetectionGraph(featureManager.getRoiMan(),featureManager);
-			ArrayList<ArrayList<Roi>> arr=cell.runTrack();
-			featureManager.setTrackSet(arr);
-			drawExamples();
-			
+		
 			String key=((Component)event.getSource()).getName();
 			String eventKey=key+"Event";
 			ArrayList<Roi> roiLabels=new ArrayList<>();
@@ -707,6 +708,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			featureManager.uploadTrackTraining(key, roiLabels);
 			featureManager.uploadTrackTrainingEvent(eventKey, eventCountUpload);
 			JOptionPane.showMessageDialog(null, "Succesfully Uploaded Labels");
+			updateGui();
+		}//end if
+		
+		if(event.getActionCommand()== "TrackButton"){	
+			CellDetectionGraph cell=new CellDetectionGraph(featureManager.getRoiMan(),featureManager);
+			ArrayList<ArrayList<Roi>> arr=cell.runTrack();
+			featureManager.setTrackSet(arr);
+			drawExamples();
+			drawExample();
+			flagTrack=1;
+			JOptionPane.showMessageDialog(null, "Succesfully Uploaded Tracks");
 			updateGui();
 		}//end if
 		
@@ -766,7 +778,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			for(ImagePlus ip:disp) {
 				is.addSlice(ip.getProcessor());
 			}
-		for(int key=1;key<=15;key++)
+		for(int key=0;key<=15;key++)
 		{	
 			
 			RoiListOverlay roiOverlay = new RoiListOverlay();
@@ -774,12 +786,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		((OverlayedImageCanvas)ic).addOverlay(roiOverlay);
 		roiOverlayList.put(key,roiOverlay);
 	}
-		int key=1;
 		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
 			Collections.reverse(rois);
-	//		roiOverlayList.get(key).setColor(getColor(key));
-	//		roiOverlayList.get(key).setRoi(rois);
-			key++;
+		//	roiOverlayList.get(key).setColor(getColor(key));
+		//	roiOverlayList.get(key).setRoi(rois);
+			
 			
 		//	for(Roi r:rois)
 		//	featureManager.getRoiMan().addRoi(r);
@@ -802,15 +813,15 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	}
 	  */
 
-	ImagePlus imagePlus=new ImagePlus("TrackedStack",is);
-	imagePlus.show();
-	imagePlus.updateAndDraw();
+	//ImagePlus imagePlus=new ImagePlus("TrackedStack",is);
+	//imagePlus.show();
+	//imagePlus.updateAndDraw();
 	getImagePlus().updateAndRepaintWindow();
 	getImagePlus().updateAndDraw();
 	}
 	private void drawExample()	{
 		
-		int key=1;
+		int key=0;
 		for(ArrayList<Roi> rois: featureManager.getTrackSet()){
 		//	Collections.reverse(rois);
 			roiOverlayList.get(key).setColor(getColor(key));
@@ -823,6 +834,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 		getImagePlus().updateAndRepaintWindow();
 		getImagePlus().updateAndDraw();
+		updateGui();
 		}
 	private Color getColor(int number) {
 		
@@ -840,10 +852,14 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	}
 	
+
+	
 	private void updateFrame() 
 	{
 		String key="ExampleCurrent";
-		drawExample();
+
+		if(flagTrack == 1)
+			drawExample();
         displayImage.killRoi();
 			
 		featureManager.getRoiMan().reset();
