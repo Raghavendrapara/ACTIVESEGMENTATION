@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import activeSegmentation.ASCommon;
 import activeSegmentation.EventType;
@@ -149,6 +150,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private JFrame frame;
     private JPanel nxt;
     private JPanel prv;
+    private JFrame nxxt;
+    private JFrame prrv;
     private ArrayList<Roi> CurrentTrackFrameRoiList;
     HashMap<Roi,Pair<Integer,String>> roiMap;
     HashMap<String,Integer> eventCount=new HashMap<>();
@@ -214,6 +217,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		
 		nxt=new JPanel();
+		nxxt=new JFrame();
 		nxt.setLayout(new BorderLayout());
 		nxtImage=featureManager.getNextImageTrack();
 		Image imag=nxtImage.getImage();
@@ -226,6 +230,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		panel.add(nxt); 
 		
 		prv=new JPanel();
+		prrv=new JFrame();
 		prvImage=featureManager.getCurrentImage();
 		imag=prvImage.getImage();
 		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
@@ -984,30 +989,61 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 
 	private void updateGuiFrame(){
 		try{
-			
-		
-			
-			nxt=new JPanel();
-			nxtImage=featureManager.getNextImageTrack();
-			Image imag=nxtImage.getImage();
-			imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
-			nxtImage=new ImagePlus("next",imag);
-			ImageCanvas temp=new ImageCanvas(nxtImage);
-		    nxt.add(temp);
-		    nxt.setBounds(360,ic.getHeight()+30,340,260);
-			frame.add(nxt);
+			if(flagTrack==1)
+			{
+				return;
+			}
+			else {
+				Runnable doRun=new Runnable() {
+					public void run() {
+						try {
+							//Thread.sleep(100);
+							nxt=new JPanel();
+							nxxt=new JFrame();
+							nxtImage=featureManager.getNextImageTrack();
+							Image imag=nxtImage.getImage();
+							imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
+							nxtImage=new ImagePlus("next",imag);
+							ImageCanvas temp=new ImageCanvas(nxtImage);
+						    nxt.setBounds(360,ic.getHeight()+30,340,260);
+							nxt.add(temp);
+						    nxt.revalidate();
+						    nxt.repaint();
+							frame.add(nxt);
 
-			
-			prv=new JPanel();
-			prvImage=featureManager.getPreviousImageTrack();
-			imag=prvImage.getImage();
-			imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
-			prvImage=new ImagePlus("prev",imag);
-			temp=new ImageCanvas(prvImage);
-		    prv.add(temp);
-		    prv.setBounds(10,ic.getHeight()+30,340,260);
-			frame.add(prv);	
-			
+						
+//						    nxt.setBounds(360,ic.getHeight()+30,340,260);
+					//		frame.add(nxt);
+
+							
+							prrv=new JFrame();
+							prv =new JPanel();
+							prvImage=featureManager.getPreviousImageTrack();
+							Image imag1=prvImage.getImage();
+							imag1=imag1.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
+							prvImage=new ImagePlus("prev",imag1);
+							temp=new ImageCanvas(prvImage);
+							prv.setBounds(10,ic.getHeight()+30,340,260);
+							prv.add(temp);
+							prv.revalidate();
+							prv.repaint();
+							frame.add(prv);
+							//Thread.sleep(100);
+							//frame.pack();
+						    //prv.setBounds(10,ic.getHeight()+30,340,260);
+							//frame.add(prv);	
+				
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				};
+
+				
+				SwingUtilities.invokeLater(doRun);
+						}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -1202,32 +1238,32 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		((OverlayedImageCanvas)ic).addOverlay(resultOverlay);
 	}
 
-	private void downloadRois(String key) {
-		String type=learningType.getSelectedItem().toString();
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int rVal = fileChooser.showOpenDialog(null);
-		if (rVal == JFileChooser.APPROVE_OPTION) {
-			String name=fileChooser.getSelectedFile().toString();
-			if(!name.endsWith(".zip")){
-				name = name + ".zip";
-			}
-
-			featureManager.saveExamples(name, key,type, featureManager.getCurrentSlice());
-		}
-	}
-
-	private void uploadExamples(String key) {
-		String type=learningType.getSelectedItem().toString();
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int rVal = fileChooser.showOpenDialog(null);
-		if (rVal == JFileChooser.APPROVE_OPTION) {
-			featureManager.uploadExamples(fileChooser.getSelectedFile().toString(),key,type, featureManager.getCurrentSlice());
-		}
-	}
+//	private void downloadRois(String key) {
+//		String type=learningType.getSelectedItem().toString();
+//		JFileChooser fileChooser = new JFileChooser();
+//		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+//		fileChooser.setAcceptAllFileFilterUsed(false);
+//		int rVal = fileChooser.showOpenDialog(null);
+//		if (rVal == JFileChooser.APPROVE_OPTION) {
+//			String name=fileChooser.getSelectedFile().toString();
+//			if(!name.endsWith(".zip")){
+//				name = name + ".zip";
+//			}
+//
+//			featureManager.saveExamples(name, key,type, featureManager.getCurrentSlice());
+//		}
+//	}
+//
+//	private void uploadExamples(String key) {
+//		String type=learningType.getSelectedItem().toString();
+//		JFileChooser fileChooser = new JFileChooser();
+//		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+//		fileChooser.setAcceptAllFileFilterUsed(false);
+//		int rVal = fileChooser.showOpenDialog(null);
+//		if (rVal == JFileChooser.APPROVE_OPTION) {
+//			featureManager.uploadExamples(fileChooser.getSelectedFile().toString(),key,type, featureManager.getCurrentSlice());
+//		}
+//	}
 
 
 

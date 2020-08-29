@@ -70,7 +70,7 @@ public class Trellis
 	// Set the initial scores to 0.
 	ArrayList<Double> tempScoreAt0=bestScores.get(0);
 	for (int n=0; n<mNodes.get(0).size(); n++) {
-        tempScoreAt0.set(n,0.0);
+        tempScoreAt0.set(n,1.0*n);
     }
     bestScores.set(0,tempScoreAt0);
     
