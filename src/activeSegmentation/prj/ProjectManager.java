@@ -282,7 +282,7 @@ public class ProjectManager {
 		String OS = System.getProperty("os.name").toLowerCase();
 		IJ.log(OS);
 		if( (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 )) {
-			activeSegDir="/home/raghavendra"+"//plugins//activeSegmentation//ACTIVE_SEG.jar";
+			activeSegDir=System.getProperty("plugins.dir")+"//plugins//activeSegmentation//ACTIVE_SEG.jar";
 		}
 		else {
 			activeSegDir=System.getProperty("plugins.dir")+"\\plugins\\activeSegmentation\\ACTIVE_SEG.jar";	

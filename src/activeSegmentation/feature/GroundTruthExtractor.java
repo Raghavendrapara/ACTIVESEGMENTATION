@@ -110,7 +110,7 @@ public class GroundTruthExtractor {
 	}
 	
 	public static ArrayList<Roi> runextracter(ImagePlus currentImage, RoiManager roiManager, int minThreshold, int maxThreshold,int frameNum) {
-        ResultsTable xx=new ResultsTable();
+        ResultsTable tempResults=new ResultsTable();
         ArrayList<Roi> listroi=new ArrayList<>();
 		for(int threshold=minThreshold; threshold<=maxThreshold; threshold++) {
 			ImagePlus copyImage= currentImage.duplicate();
@@ -126,10 +126,10 @@ public class GroundTruthExtractor {
 				ip.invert();
 				//temp.show();
 				ParticleAnalyzer.setRoiManager(roiManager);
-				ParticleAnalyzer analyzer= new ParticleAnalyzer(ParticleAnalyzer.ADD_TO_MANAGER,Analyzer.getMeasurements(),xx,1.0, Double.POSITIVE_INFINITY);
+				ParticleAnalyzer analyzer= new ParticleAnalyzer(ParticleAnalyzer.ADD_TO_MANAGER,Analyzer.getMeasurements(),tempResults,1.0, Double.POSITIVE_INFINITY);
 				analyzer.analyze(temp);
 				Analyzer.setMeasurements(65536-1);
-				xx=Analyzer.getResultsTable();
+				tempResults=Analyzer.getResultsTable();
 				}
 			
 		
@@ -175,9 +175,9 @@ public class GroundTruthExtractor {
 		xx.reset();
 
 */
-		Roi r[]=roiManager.getRoisAsArray();
+		Roi tempRoiArray[]=roiManager.getRoisAsArray();
 		
-		for(Roi rr:r)
+		for(Roi rr:tempRoiArray)
 		listroi.add(rr);
 		currentImage.killRoi();
 		roiManager.reset();

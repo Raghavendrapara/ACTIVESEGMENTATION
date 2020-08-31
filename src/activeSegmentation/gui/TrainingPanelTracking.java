@@ -999,7 +999,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 						try {
 							//Thread.sleep(100);
 							nxt=new JPanel();
-							nxxt=new JFrame();
+							//nxxt=new JFrame();
 							nxtImage=featureManager.getNextImageTrack();
 							Image imag=nxtImage.getImage();
 							imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
@@ -1016,7 +1016,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 					//		frame.add(nxt);
 
 							
-							prrv=new JFrame();
+						//	prrv=new JFrame();
 							prv =new JPanel();
 							prvImage=featureManager.getPreviousImageTrack();
 							Image imag1=prvImage.getImage();
