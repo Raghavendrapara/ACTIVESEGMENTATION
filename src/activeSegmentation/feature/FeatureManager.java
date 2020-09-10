@@ -78,10 +78,21 @@ public class FeatureManager  {
 	private List<Color> defaultColors;
 	ClassifierManager learningManager;
 	private Map<String,Integer> predictionResultClassification;
+
+	
+	//Counter for Cell Events in fixed event probability histogram model
     private int mitosiscnt,apoptosiscnt,clustercnt,migrationcnt;
+   
+    //ImageProcessor object
     private ImageProcessor TrackTrainProcessor;
+    
+    //ArrayList that stores the track information after processing
     private ArrayList<ArrayList<Roi>> trackSet;
+    
+    //List Of Colors to store color corresponding to Track
     private List<Color> trackColor;
+    
+    
 	public FeatureManager(ProjectManager projectManager, ClassifierManager learningManager) {
 		this.projectManager = projectManager;
 		this.learningManager=learningManager;
@@ -169,10 +180,16 @@ public class FeatureManager  {
 			return false;
 		
 	}
+	
+	
+	//public method to add Roi object to RoiManager
 	public void addtoManager(Roi roi)
 	{
 		roiman.addRoi(roi);
 	}
+	
+	
+	//public method to get the common RoiManager object
 	public RoiManager getRoiMan()
 	{
 		return roiman;
@@ -312,66 +329,83 @@ public class FeatureManager  {
 		return classes.size();
 	}
 
+	//Increments the Mitosis Count on press button action from Cell Tracking Training Frame 
 	public void addMitosis() {
 	
 		mitosiscnt+=1;
 	}
 	
+
+	//Increments the Apoptosis Count on press button action from Cell Tracking Training Frame
 	public void addApoptosis() {
 		
 		apoptosiscnt+=1;
 	}
 	
+
+	//Increments the Cell Cluster Count on press button action from Cell Tracking Training Frame
 	public void addClusterCount() {
 		 
 		clustercnt+=1;
 	}
 	
+	//Increments the default Migration event counter by number of Rois in Image 
 	public void addMigration(int cnt) {
 		 
 		migrationcnt+=cnt;
 	}
 	
+	//public method to get Mitosis Count
 	public int getMitosis() {
 	
 		return mitosiscnt;
 	}
 	
+	//public method to get Apoptosis Count
     public int getApoptosis() {
 		
     	return apoptosiscnt;
 	}
     
+    //public method to get Migration Count
     public int getMigration(){
 		
     	return migrationcnt;
 	}
 
+    //public method to get Clusters Count
     public int getClusterCount() {
 	
     	
     	return clustercnt;
      }
+    
+    
+    //public method to load already saved data on Event 
 	public void setMitosis(int mitocnt) {
 		
 		mitosiscnt = mitocnt;
 	}
 	
-    public void setApoptosis(int apopto) {
+    //public method to load already saved data on Event 
+	public void setApoptosis(int apopto) {
 		
     	apoptosiscnt = apopto;
 	}
     
-    public void setMigration(int mig){
+    //public method to load already saved data on Event 
+	public void setMigration(int mig){
 		
     	migrationcnt = mig;
 	}
 
+	//public method to load already saved data on Event 
     public void setClusterCount(int clusto) {
 	
     	
     	clustercnt = clusto;
      }
+    
     
 	public void addClass() {
 		String key = UUID.randomUUID().toString();
@@ -393,7 +427,6 @@ public class FeatureManager  {
 			float g = rand.nextFloat();
 			float b = rand.nextFloat();
 			Color randomColor = new Color(r, g, b);
-			defaultColors.add(randomColor);
 			return randomColor;
 		}
 
@@ -479,12 +512,14 @@ public class FeatureManager  {
 		projectManager.writeMetaInfo(projectInfo);
 	}
 
+	//Returns the address of Tracking Directory
 	public String getTrackPath()
 	{
 		return trackPath;
 	}
 	
 
+	//Stores the Rois labelled in Training Frame of CellTracking as zip
 	public boolean uploadTrackTraining(String filename, List<Roi> rois) {
 		
 		String fileStoreAt=trackPath+"/"+filename+ASCommon.FORMAT;
@@ -513,7 +548,9 @@ public class FeatureManager  {
 		}
 		return true;
 	}
-public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts) {
+	
+	//Stores the Count Of Events as text in Tracking Folder
+     public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts) {
 		
 		String fileStoreAt=trackPath+"/"+filename+".txt";
 		//System.out.println(fileStoreAt);
@@ -532,18 +569,11 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		}
         
 		
-		
-		
-		
-		
-		
 		return false;
 	
-		
-		
-		
 	}
 
+     //Returns the Saved Rois from zip file in Tracking Folder
 	 public List<Roi> getTrackRoiLabel(String key)
 	 {
 		 List<Roi> templistRoi = openZip(key);
@@ -835,6 +865,8 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		//System.out.println("next slice"+sliceNum);
 		return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
+	
+	//ImagePlus object to show nextImage below current Image in Cell Tracking Training Frame
 	public ImagePlus getNextImageTrack() {
 	
 		if(this.sliceNum < totalSlices) {
@@ -851,6 +883,7 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
 
+	//ImagePlus object to show Previous Image below current Image in Cell Tracking Training Frame
 	public ImagePlus getPreviousImageTrack() {
 		if (this.sliceNum > 1) {
 		return new ImagePlus(projectString + this.images.get(sliceNum - 2));}
@@ -858,6 +891,7 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 			return new ImagePlus(projectString + this.images.get(sliceNum - 1));
 	}
 	
+	//Returns all the ImagePlus objects of Images Folder for Tracking 
 	public ArrayList<ImagePlus> getImageList(){
 		
 		ArrayList<ImagePlus> litImags=new ArrayList<ImagePlus>();
@@ -872,10 +906,9 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		
 		
 		return litImags;
-                                
-		
-		
+    
 	}
+	
 	private ImagePlus createImageIcon(String path) {
 		java.net.URL imgURL = FeatureManager.class.getResource(path);
 		if (imgURL != null) {
@@ -885,6 +918,7 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		}
 	}
 
+	
 	public List<Color> getColors() {
 		List<Color> colors = new ArrayList<>();
 		for (ClassInfo classInfo : classes.values()) {
@@ -894,16 +928,19 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		return colors;
 	}
 
+	//TrackTrainProcessor is used by Training Frame Class
 	public void setTrackProcessor(ImageProcessor ip) {
 		// TODO Auto-generated method stub
 		TrackTrainProcessor=ip;
 		
 	}
+	
 	public ImageProcessor getTrack()
 	{
 		return TrackTrainProcessor;
 	}
 
+	//trackSet stores positions of Roi for predicted Tracks of Rois
 	public ArrayList<ArrayList<Roi>> getTrackSet() {
 		return trackSet;
 	}
@@ -912,6 +949,7 @@ public boolean uploadTrackTrainingEvent(String filename, List<String> eventCnts)
 		this.trackSet = trackSet;
 	}
 
+	//Color object is returned for Track Coloring
 	public Color getTrackColor(int key) {
 		return trackColor.get(key);
 	}

@@ -93,7 +93,7 @@ public interface ASCommon {
 	public static final String LEARNINGDIR="LEARNINGDIR";
 	public static final String IMAGESDIR="IMAGESDIR";
 	public static final String EVALUATIONDIR="EVALUATIONDIR";
-	public static final String TRACKINGDIR="TRACKING";
+	public static final String TRACKINGDIR="TRACKING"; //Creates a Directory for Cell Tracks and Metadata
 
 	/*
 	 *  GUI constants

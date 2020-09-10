@@ -1,5 +1,5 @@
 package activeSegmentation;
-
+//Enumeration over cell event outcome
 public enum EventType {
 
 	EVENT_TRUE (1),  
