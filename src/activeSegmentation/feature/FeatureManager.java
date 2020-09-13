@@ -83,13 +83,11 @@ public class FeatureManager  {
 	//Counter for Cell Events in fixed event probability histogram model
     private int mitosiscnt,apoptosiscnt,clustercnt,migrationcnt;
    
-    //ImageProcessor object
     private ImageProcessor TrackTrainProcessor;
     
     //ArrayList that stores the track information after processing
     private ArrayList<ArrayList<Roi>> trackSet;
-    
-    //List Of Colors to store color corresponding to Track
+   
     private List<Color> trackColor;
     
     
@@ -182,17 +180,10 @@ public class FeatureManager  {
 	}
 	
 	
-	//public method to add Roi object to RoiManager
+	//Helps to set Rois and get Roi Names
 	public void addtoManager(Roi roi)
 	{
 		roiman.addRoi(roi);
-	}
-	
-	
-	//public method to get the common RoiManager object
-	public RoiManager getRoiMan()
-	{
-		return roiman;
 	}
 	/*
 	 * improve
@@ -335,16 +326,12 @@ public class FeatureManager  {
 		mitosiscnt+=1;
 	}
 	
-
-	//Increments the Apoptosis Count on press button action from Cell Tracking Training Frame
 	public void addApoptosis() {
 		
 		apoptosiscnt+=1;
 	}
 	
-
-	//Increments the Cell Cluster Count on press button action from Cell Tracking Training Frame
-	public void addClusterCount() {
+    public void addClusterCount() {
 		 
 		clustercnt+=1;
 	}
@@ -355,56 +342,7 @@ public class FeatureManager  {
 		migrationcnt+=cnt;
 	}
 	
-	//public method to get Mitosis Count
-	public int getMitosis() {
 	
-		return mitosiscnt;
-	}
-	
-	//public method to get Apoptosis Count
-    public int getApoptosis() {
-		
-    	return apoptosiscnt;
-	}
-    
-    //public method to get Migration Count
-    public int getMigration(){
-		
-    	return migrationcnt;
-	}
-
-    //public method to get Clusters Count
-    public int getClusterCount() {
-	
-    	
-    	return clustercnt;
-     }
-    
-    
-    //public method to load already saved data on Event 
-	public void setMitosis(int mitocnt) {
-		
-		mitosiscnt = mitocnt;
-	}
-	
-    //public method to load already saved data on Event 
-	public void setApoptosis(int apopto) {
-		
-    	apoptosiscnt = apopto;
-	}
-    
-    //public method to load already saved data on Event 
-	public void setMigration(int mig){
-		
-    	migrationcnt = mig;
-	}
-
-	//public method to load already saved data on Event 
-    public void setClusterCount(int clusto) {
-	
-    	
-    	clustercnt = clusto;
-     }
     
     
 	public void addClass() {
@@ -512,11 +450,6 @@ public class FeatureManager  {
 		projectManager.writeMetaInfo(projectInfo);
 	}
 
-	//Returns the address of Tracking Directory
-	public String getTrackPath()
-	{
-		return trackPath;
-	}
 	
 
 	//Stores the Rois labelled in Training Frame of CellTracking as zip
@@ -958,4 +891,56 @@ public class FeatureManager  {
 		this.trackColor = trackColor;
 	}
 	
+	public RoiManager getRoiMan()
+	{
+		return roiman;
+	}
+	
+	public int getMitosis() {
+		
+			return mitosiscnt;
+		}
+		
+    public int getApoptosis() {
+			
+	    	return apoptosiscnt;
+		}
+	    
+	public int getMigration(){
+			
+	    	return migrationcnt;
+		}
+
+	public int getClusterCount() {
+		
+	    	
+	    	return clustercnt;
+	     }
+
+   	public void setMitosis(int mitocnt) {
+			
+			mitosiscnt = mitocnt;
+		}
+		
+	public void setApoptosis(int apopto) {
+			
+	    	apoptosiscnt = apopto;
+		}
+	    
+	public void setMigration(int mig){
+			
+	    	migrationcnt = mig;
+		}
+
+	public void setClusterCount(int clusto) {
+		
+	    	
+	    	clustercnt = clusto;
+	     }
+	
+	public String getTrackPath() {
+		
+			return trackPath;
+		
+	}
 }
