@@ -92,9 +92,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	HashMap<Integer, RoiListOverlay> roiOverlayList=new HashMap<Integer, RoiListOverlay>();
 	private Vector<String> templist=new Vector<>();
 	private Vector<String> templistFrame=new Vector<>();
+	
+	//Defines Frame size bounds for Training
 	public static final int  largeframeWidth=1200;
 	public static final int  largeframeHight=1000;
 	
+	//Defines square dimensions for current Image Frame
 	public static final int IMAGE_CANVAS_DIMENSION = 700; //same width and height	
 
 	/** array of ROI list overlays to paint the transparent ROIs of each class */
@@ -107,30 +110,17 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	JList<String> listCurrent;
 	HashSet<String> roiAlreadyLabelled=new HashSet<>(); 
 	DefaultListModel<String> dl=new DefaultListModel<>();
-	/** Used only during classification setting*/
-	private Map<String,Integer> predictionResultClassification;
-
 	final Composite transparency050 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f );
 	
 	/*
 	 *  the files must be in the resources/feature folder
 	 */
-	private static final Icon uploadIcon = new ImageIcon(TrainingPanelTracking.class.getResource("upload.png"));
-	private static final Icon downloadIcon = new ImageIcon(TrainingPanelTracking.class.getResource("download.png"));
- 
 
 	/** This {@link ActionEvent} is fired when the 'next' button is pressed. */
 	private ActionEvent NEXT_BUTTON_PRESSED = new ActionEvent( this, 0, "Next" );
 	/** This {@link ActionEvent} is fired when  the 'previous' button is pressed. */
 	private ActionEvent PREVIOUS_BUTTON_PRESSED  = new ActionEvent( this, 1, "Previous" );
-	private ActionEvent ADDCLASS_BUTTON_PRESSED  = new ActionEvent( this, 2, "AddClass" );
-	private ActionEvent SAVECLASS_BUTTON_PRESSED = new ActionEvent( this, 3, "SaveLabel" );
-	private ActionEvent DELETE_BUTTON_PRESSED    = new ActionEvent( this, 4, "DeleteClass" );
-	private ActionEvent COMPUTE_BUTTON_PRESSED   = new ActionEvent( this, 5, "TRAIN" );
-	private ActionEvent SAVE_BUTTON_PRESSED      = new ActionEvent( this, 6, "SAVEDATA" );
-	private ActionEvent TOGGLE_BUTTON_PRESSED    = new ActionEvent( this, 7, "TOGGLE" );
 	private ActionEvent DOWNLOAD_BUTTON_PRESSED  = new ActionEvent( this, 8, "DOWNLOAD" );
-	private ActionEvent MASKS_BUTTON_PRESSED     = new ActionEvent( this, 9, "MASKS" );
 	private ActionEvent MITOSIS_BUTTON_PRESSED   = new ActionEvent( this, 10, "MITOSIS" );
 	private ActionEvent APOPTOSIS_BUTTON_PRESSED = new ActionEvent( this, 11, "APOPTOSIS" );
 	private ActionEvent CLUSTERCOUNT_BUTTON_PRESSED = new ActionEvent( this, 12, "CLUSTERCOUNT" );
@@ -150,9 +140,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	private JFrame frame;
     private JPanel nxt;
     private JPanel prv;
-    private JFrame nxxt;
-    private JFrame prrv;
-    private ArrayList<Roi> CurrentTrackFrameRoiList;
+    private JPanel panel;
+ // private JFrame nxxt;
+ // private JFrame prrv;
+   
+    //List Of Rois for Current ImageFrame, to display in the TrainingPanel
+    private ArrayList<Roi> CurrFrameRois;
     HashMap<Roi,Pair<Integer,String>> roiMap;
     HashMap<String,Integer> eventCount=new HashMap<>();
     private List<Color> defaultColors;
@@ -170,8 +163,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		roiOverlayList = new HashMap<Integer, RoiListOverlay>();
 		//tempClassifiedImage = new ImagePlus();		
 		this.setVisible(false);
-		this.CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
-		featureManager.addMigration(CurrentTrackFrameRoiList.size());
+		this.CurrFrameRois=GroundTruthExtractor.runextracter(displayImage,featureManager.getRoiMan(),1,255,0);
+		featureManager.addMigration(CurrFrameRois.size());
 		
 		resetRois();
 		showPanel();
@@ -189,7 +182,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		frameList.setForeground(Color.BLACK);
 		
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setLayout(null);
 		panel.setFont(panelFONT);
 		panel.setBackground(Color.GRAY);
@@ -217,7 +210,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 		
 		nxt=new JPanel();
-		nxxt=new JFrame();
+	//	nxxt=new JFrame();
 		nxt.setLayout(new BorderLayout());
 		nxtImage=featureManager.getNextImageTrack();
 		Image imag=nxtImage.getImage();
@@ -230,7 +223,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		panel.add(nxt); 
 		
 		prv=new JPanel();
-		prrv=new JFrame();
+	//	prrv=new JFrame();
 		prvImage=featureManager.getCurrentImage();
 		imag=prvImage.getImage();
 		imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
@@ -338,7 +331,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		addButton(new JButton(), "APOPTOSIS",null , 800, 20, 130, 20,classPanel,APOPTOSIS_BUTTON_PRESSED,null );
 		addButton(new JButton(), "CLUSTERCOUNT",null , 800, 20, 130, 20,classPanel,CLUSTERCOUNT_BUTTON_PRESSED,null );
 		dl.addElement("                ");
-        for(Roi rr:CurrentTrackFrameRoiList) {
+        for(Roi rr:CurrFrameRois) {
 		dl.addElement(rr.getName());
 		roiNameMapAll.put(rr.getName(), rr);
         }
@@ -441,13 +434,7 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		
 	}
 	public void doAction( final ActionEvent event ) {
-		if(event== ADDCLASS_BUTTON_PRESSED){
-			featureManager.addClass();
-			addClassPanel();
-			validateFrame();
-			updateGui();
-		} // end if
-		
+	
 		if(event== MITOSIS_BUTTON_PRESSED){
 			
 			featureManager.addtoManager(displayImage.getRoi());
@@ -536,58 +523,12 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 		}
 		
 		
-		if(event==DELETE_BUTTON_PRESSED){          
-
-			System.out.println(featureManager.getNumOfClasses());
-			System.out.println(jCheckBoxList.size());
-			int totalDel=0;
-			
-			for (JCheckBox checkBox : jCheckBoxList) 
-				if (checkBox.isSelected()) 
-					totalDel++;
-		
-			if(featureManager.getNumOfClasses()-totalDel<2) 
-             JOptionPane.showMessageDialog(null, "There should be minimum two classes");
-			else {
-				for (JCheckBox checkBox : jCheckBoxList) 
-					if (checkBox.isSelected()) 
-						featureManager.deleteClass(checkBox.getName());
-				addClassPanel();
-				validateFrame();
-				updateGui();
-			}	
-
-		} // end if
-
-		if(event==SAVE_BUTTON_PRESSED){
-			featureManager.saveFeatureMetadata();
-			JOptionPane.showMessageDialog(null, "Successfully saved regions of interest");
-		} //end if
-		
-		if(event==SAVECLASS_BUTTON_PRESSED){
-			for (JCheckBox checkBox : jCheckBoxList) {				
-				//System.out.println(checkBox.getText());
-				String key=checkBox.getName();
-				featureManager.setClassLabel(key,jTextList.get(key).getText() );
-				
-			}
-			addClassPanel();
-			validateFrame();
-			updateGui();
-		} // end if
-		
 		if(event == PREVIOUS_BUTTON_PRESSED){		
 			ImagePlus image=featureManager.getPreviousImage();
 			imageNum.setText(Integer.toString(featureManager.getCurrentSlice()));
 			loadImage(image);
 			
-			if (showColorOverlay){
-				if(featureManager.getProjectType()==ProjectType.CLASSIF) 
-					classifiedImage = null;
-				else 
-					classifiedImage=featureManager.getClassifiedImage();		
-				updateResultOverlay(classifiedImage);
-			}
+			
 
 			// force limit size of image window
 			if(ic.getWidth()>IMAGE_CANVAS_DIMENSION) {
@@ -604,13 +545,8 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 			ImagePlus image=featureManager.getNextImage();
 			imageNum.setText(Integer.toString(featureManager.getCurrentSlice()));
 			loadImage(image);
-			if (showColorOverlay){
-				if(featureManager.getProjectType()==ProjectType.CLASSIF)
-					classifiedImage = null;
-				else
-					classifiedImage=featureManager.getClassifiedImage();
-				updateResultOverlay(classifiedImage);
-			}
+			
+			
 
 			// force limit size of image window
 			if(ic.getWidth()>IMAGE_CANVAS_DIMENSION) {
@@ -619,67 +555,10 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 				ic.zoomIn(x_centre,y_centre);
 			}
 			//imagePanel.add(ic);
+			updateGuiFrame();
 			updateGui();
 			updateFrame();
-			updateGuiFrame();
-		} // end if
-		
-		if(event==COMPUTE_BUTTON_PRESSED){
-			if(featureManager.getProjectType()==ProjectType.CLASSIF) {
-				// it means new round of training, so set result setting to false
-				showColorOverlay = false;
-				// removing previous markings and reset things
-				predictionResultClassification = null;
-				displayImage.setOverlay(null);
-
-				// compute new predictions
-				featureManager.compute();				
-				predictionResultClassification = featureManager.getClassificationResultMap();
-
-				// we do not need to get any image in classification setting, only predictions are needed
-				classifiedImage = null;
-			}
-
-			//segmentation setting
-			else {
-				classifiedImage=featureManager.compute();
-			}
-			IJ.log("compute");
-
-			toggleOverlay();
-		} //end if
-		
-		if(event==TOGGLE_BUTTON_PRESSED){
-			toggleOverlay();
-		} // end if
-		
-		if(event==DOWNLOAD_BUTTON_PRESSED){
-
-			ImagePlus image=featureManager.stackedClassifiedImage();
-			image.show();
-			//FileSaver saver= new FileSaver(image);
-			//saver.saveAsTiff();
-		} //end if
-		
-		if(event==MASKS_BUTTON_PRESSED){
-			System.out.println("masks ");
-			if (classifiedImage==null) {
-				classifiedImage=featureManager.compute();
-			}
-			classifiedImage.show();
-			 
-		} //end if
-		
-		if(event.getActionCommand()== "ColorButton"){	
-			String key=((Component)event.getSource()).getName();
-			Color c;
-			c = JColorChooser.showDialog( new JFrame(),
-					"CLASS COLOR", featureManager.getClassColor(key));
-
-			((Component)event.getSource()).setBackground(c);
-			featureManager.updateColor(key, c);
-			updateGui();
-		}// end if
+	}
 		
 		if(event.getActionCommand()== "AddButton"){	
 			if(roiAlreadyLabelled.contains(displayImage.getRoi()))
@@ -868,11 +747,11 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
         displayImage.killRoi();
 			
 		featureManager.getRoiMan().reset();
-		CurrentTrackFrameRoiList=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),1,255,0);
-		featureManager.addMigration(CurrentTrackFrameRoiList.size());
+		CurrFrameRois=GroundTruthExtractor.runextracter(featureManager.getCurrentImage(), featureManager.getRoiMan(),1,255,0);
+		featureManager.addMigration(CurrFrameRois.size());
 		resetRois();
 		templistFrame.clear();
-		for(Roi rr:CurrentTrackFrameRoiList) {
+		for(Roi rr:CurrFrameRois) {
 	    templistFrame.addElement(rr.getName());
 	    roiNameMapAll.put(rr.getName(), rr);
 		}
@@ -885,82 +764,9 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 	/**
 	 * Toggle between overlay and original image with markings
 	 */
-	private void toggleOverlay()
-	{
-		if(featureManager.getProjectType()== ProjectType.SEGM) {
-			showColorOverlay = !showColorOverlay;			
-			if (showColorOverlay && (null != classifiedImage)){
-				updateResultOverlay(classifiedImage);
-			}
-			else{
-				resultOverlay.setImage(null);
-				displayImage.updateAndDraw();
-			}
-		}
+	
 
-		// classification setting, no classified image
-		else {			
-			showColorOverlay = !showColorOverlay;
-			// user wants to see results
-			if(showColorOverlay) {
-				updateResultOverlay(classifiedImage);
-			}
-
-			// user wants to see original rois, no results
-			else {
-
-				// remove result overlay
-				displayImage.setOverlay(null);
-				displayImage.updateAndDraw();
-
-				//just show examples drawn by user
-				updateGui();
-			}
-		}		
-	}
-
-	public void updateResultOverlay(ImagePlus classifiedImage)
-	{
-		if(featureManager.getProjectType()==ProjectType.SEGM) {
-			ImageProcessor overlay = classifiedImage.getProcessor().duplicate();
-			overlay = overlay.convertToByte(false);
-			setLut(featureManager.getColors());
-			overlay.setColorModel(overlayLUT);
-			resultOverlay.setImage(overlay);
-			displayImage.updateAndDraw();
-		}
-
-		if(featureManager.getProjectType()== ProjectType.CLASSIF) {
-			// remove previous overlay
-			displayImage.setOverlay(null);
-			displayImage.updateAndDraw();
-
-			//get current slice
-			int currentSlice = featureManager.getCurrentSlice();			
-			Font font = new Font("Arial", Font.PLAIN, 38);           
-			Overlay overlay = new Overlay();		 		 			 			
-			ArrayList<Roi> rois;
-			for(String classKey:featureManager.getClassKeys()) {
-				//returns rois of current image slice of given class, current slice is updated internally
-				rois = (ArrayList<Roi>) featureManager.getExamples(classKey,learningType.getSelectedItem().toString(), featureManager.getCurrentSlice());
-				if(rois!=null) {					
-					for (Roi roi:rois) {
-						int pred = predictionResultClassification.get(roi.getName());
-						TextRoi textroi = new TextRoi(roi.getBounds().x,roi.getBounds().y,
-								roi.getFloatWidth(),roi.getFloatHeight(),Integer.toString(pred),font);
-						textroi.setFillColor(roi.getFillColor());
-						//textroi.setNonScalable(true);
-						textroi.setPosition(currentSlice);
-						overlay.add(textroi);
-					}
-				}
-			}
-			// add result overlay
-			displayImage.setOverlay(overlay);			
-			displayImage.updateAndDraw();				
-		}
-	}
-
+	
 	public void setLut(List<Color> colors ){
 		int i=0;
 		for(Color color: colors){
@@ -998,19 +804,24 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 					public void run() {
 						try {
 							//Thread.sleep(100);
+							
 							nxt=new JPanel();
 							//nxxt=new JFrame();
 							nxtImage=featureManager.getNextImageTrack();
 							Image imag=nxtImage.getImage();
 							imag=imag.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 							nxtImage=new ImagePlus("next",imag);
-							ImageCanvas temp=new ImageCanvas(nxtImage);
+							ImageCanvas temp=new ImageCanvas(nxtImage.duplicate());
+							
 						    nxt.setBounds(360,ic.getHeight()+30,340,260);
-							nxt.add(temp);
-						    nxt.revalidate();
-						    nxt.repaint();
-							frame.add(nxt);
-
+							JLabel temp1=new JLabel();
+							temp1.setBounds(360, ic.getHeight()+30, 340, 260);
+							temp1.add(temp);
+						    nxt.add(temp);
+							panel.add(nxt);
+                         // Thread.sleep(100, 10);;
+						   
+						    
 						
 //						    nxt.setBounds(360,ic.getHeight()+30,340,260);
 					//		frame.add(nxt);
@@ -1022,16 +833,14 @@ public class TrainingPanelTracking extends ImageWindow implements ASCommon  {
 							Image imag1=prvImage.getImage();
 							imag1=imag1.getScaledInstance(340, 260, Image.SCALE_SMOOTH);
 							prvImage=new ImagePlus("prev",imag1);
-							temp=new ImageCanvas(prvImage);
+							temp=new ImageCanvas(prvImage.duplicate());
 							prv.setBounds(10,ic.getHeight()+30,340,260);
-							prv.add(temp);
-							prv.revalidate();
-							prv.repaint();
-							frame.add(prv);
-							//Thread.sleep(100);
+						    prv.add(temp);
+							panel.add(prv);
+							
 							//frame.pack();
 						    //prv.setBounds(10,ic.getHeight()+30,340,260);
-							//frame.add(prv);	
+								
 				
 						}
 						catch(Exception e)
