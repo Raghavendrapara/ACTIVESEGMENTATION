@@ -68,10 +68,10 @@ public interface ASCommon {
 	public static final String CLASSIFIER="classifier";
 	public static final String COMMENT="Comment";
 	public static final String DEFAULTCOMMENT=" DefaultComment";
-	public static final String CREATEDATE="CreateDate";
-	public static final String  MODIFYDATE="ModifyDate";
-	public static final String  PATH="Path";
-	public static final String  FORMAT=".zip";
+	//public static final String CREATEDATE="CreateDate";
+	//public static final String MODIFYDATE="ModifyDate";
+	public static final String PATH="Path";
+	public static final String FORMAT=".zip";
 	public static final String ROILIST="RoiList";
 	public static final String FILTERFILELIST="FilterFileList";
 	// type of learning
@@ -85,14 +85,27 @@ public interface ASCommon {
 	public static final String LEARNINGTYPE="learningType";
 	// session file name
 	public static final String FILENAME="project.json";
-	
-	public static final String TRAININGIMAGE="trainingstack";
-	public static final String PROJECTDIR="PROJECTDIR";
-	public static final String FEATURESDIR="FEATURESDIR";
-	public static final String FILTERSDIR="FILTERSDIR";
-	public static final String LEARNINGDIR="LEARNINGDIR";
-	public static final String IMAGESDIR="IMAGESDIR";
-	public static final String EVALUATIONDIR="EVALUATIONDIR";
+	/*  
+	 * folder structure
+	 */
+	/* keys */
+	public static final String K_TRAININGIMAGE="trainingstack";
+	public static final String K_PROJECTDIR="PROJECTDIR";
+	public static final String K_FEATURESDIR="FEATURESDIR";
+	public static final String K_FILTERSDIR="FILTERSDIR";
+	public static final String K_LEARNINGDIR="LEARNINGDIR";
+	public static final String K_IMAGESDIR="IMAGESDIR";
+	public static final String K_EVALUATIONDIR="EVALUATIONDIR";
+	public static final String K_TESTIMAGESDIR="TESTIMAGESDIR";
+	public static final String K_TESTFILTERDIR="TESTFILTERSDIR";
+	/* default folders */
+	public static final String filterDir="/filters/";
+	public static final String testfilterDir="/testfilters/";
+	public static final String featureDir="/features/";
+	public static final String learnDir="/learning/";
+	public static final String evalDir="/evaluation/";
+	public static final String imagDir="/images/";
+	public static final String testimagDir="/testimages/";
 	
 	/*
 	 *  GUI constants

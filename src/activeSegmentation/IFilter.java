@@ -16,7 +16,7 @@ import activeSegmentation.filter.LoG_Filter_;
 
 /**
  * * 
- * @author Sumit Kumar Vohra and Dimiter Prodanov, IMEC
+ * @author Sumit Kumar Vohra, ZIB and Dimiter Prodanov, IMEC
  *
  *
  * @contents abstract filter description
@@ -50,7 +50,7 @@ public interface IFilter extends IAnnotated {
 	
 	/**
 	 * Returns true if setting are updated successfully
-	 * @param  settingsMap a map of Strings storing information about settings with their new, customised values
+	 * @param  settingsMap a map of Strings storing information about settings with their new, customized values
 	 * @return boolean value indicating if settings has been updated or has not
 	 */
 	public boolean updateSettings(Map<String, String> settingsMap);
@@ -61,14 +61,13 @@ public interface IFilter extends IAnnotated {
 	 * Applies a filter to
 	 * @param image an instance of an ImageProcessor  - contains the pixel data of a 2D image
 	 * @param path - folder path in which the output is stored
-	 * @param roiList - allows for working on roi level, rather than on each pixel
+	 * @param roiList - allows for working on ROI level, rather than on each pixel
 	 *
 	 */	
 	public void applyFilter(ImageProcessor image, String path, List<Roi> roiList);
 	
 	/**
 	 * returns a unique key of filter
-	 *  // to be replaced by universally unique identifier
 	 * @return String containing the key
 	 */
 	public default String getKey() {
@@ -77,8 +76,8 @@ public interface IFilter extends IAnnotated {
 	}
 	
 	/**
-	 * Returns the name of the filter
-	 * @return String with its name
+	 * Returns the long name of the filter
+	 * @return String  
 	 */
 	public default String getName() {
 		Pair<String,String> p = getKeyVal();
@@ -113,8 +112,13 @@ public interface IFilter extends IAnnotated {
 		return FilterType.SEGM;
 	}
 	
-	
-	
+	/**
+	 * will provide filter specific help message
+	 * @return
+	 */
+	default public String helpInfo() {
+		return "This is a filter";
+	}
 
 	
 }

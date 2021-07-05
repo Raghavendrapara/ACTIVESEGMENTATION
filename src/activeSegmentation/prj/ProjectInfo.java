@@ -17,12 +17,14 @@ import ijaux.datatype.Pair;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/*
+/**
  * Project metadata structure
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class ProjectInfo{
 	
 	///////////////////
@@ -56,11 +58,9 @@ public class ProjectInfo{
 	
 	private String testingStack="";
 	
-	private List<Map<String, String>> filters = new ArrayList<Map<String, String>>();
+	private List<Map<String, String>> filters = new ArrayList<>();
 	
-	private List<FeatureInfo> featureList = new ArrayList<FeatureInfo>();
-	
-	private Map<String, String> learning = new HashMap<String, String>();
+	private List<FeatureInfo> featureList = new ArrayList<>();
 	
 	private String groundtruth="";
 	
@@ -70,13 +70,16 @@ public class ProjectInfo{
 	 * JSON ignore
 	 */
 	@JsonIgnore
-	private Map<String, String> projectDirectory = new HashMap<String,String>();
+	private Map<String, String> learning = new HashMap<>();
 	
 	@JsonIgnore
-	private Map<String, Set<String>> featureNames = new HashMap<String, Set<String>>();
+	private Map<String, String> projectDirectory = new HashMap<>();
 	
 	@JsonIgnore
-	private Map<String,List<Pair<String,double[]>>> features=new HashMap<String,List<Pair<String,double[]>>>();
+	private Map<String, Set<String>> featureNames = new HashMap<>();
+	
+	@JsonIgnore
+	private Map<String,List<Pair<String,double[]>>> features=new HashMap<>();
 	
 	@JsonIgnore
 	private IClassifier classifier;

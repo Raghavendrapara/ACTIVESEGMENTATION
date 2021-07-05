@@ -7,7 +7,18 @@ import ij.ImagePlus;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
-public class GLCMTextureDescriptors {
+/**
+ * The feature implements the 
+ * Haralick, R. M.; Shanmugam, K. & Dinstein, I.
+Textural Features for Image Classification 
+IEEE Transactions on Systems, Man, and Cybernetics, 
+1973, {SMC}-3, 610-621
+
+Helper class
+ *
+ */
+
+public class GLCMTexture {
 
 	private int d;
 	private int phi;
@@ -23,7 +34,7 @@ public class GLCMTextureDescriptors {
 
 	// d is the pixel distance, phi is direction angle
 
-	public GLCMTextureDescriptors(){
+	public GLCMTexture(){
 		/*this.d = d;
 		this.phi = phi;*/
 		glcm = new double [GRAY_LEVELS][GRAY_LEVELS];
@@ -166,7 +177,7 @@ public class GLCMTextureDescriptors {
 		Rectangle roi = ip.getRoi();
 		// get byte arrays for the image pixels and mask pixels
 		int width = ip.getWidth();
-		int height = ip.getHeight();
+		//int height = ip.getHeight();
 		byte [] pixels = (byte []) ip.getPixels();
 		byte [] mask = ip.getMaskArray();
 		int value;

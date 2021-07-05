@@ -6,7 +6,7 @@ import ij.process.ImageProcessor;
     1. http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/SHUTLER3/node10.html
     2. FAST COMPUTATION OF LEGENDRE AND ZERNIKE MOMENTS https://www.sciencedirect.com/science/article/pii/003132039500011N
     3. An Efficient Method for the Computation of Legendre Moments  IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE, VOL. 27, NO. 12, DECEMBER 2005
-        (exact legendre moment calculation method has been followed)
+        (exact Legendre moment calculation method has been followed)
  */
 
 
@@ -133,7 +133,7 @@ public class LegendreMoments_elm {
         return moment_matrix;
     }
 
-    // returns nth order moment of the ith row,
+    // returns nth order moment of the i-th row,
 
     private double row_moment(int i, int n, int N, ImageProcessor ip){
         double row_moment_value = 0.0;
