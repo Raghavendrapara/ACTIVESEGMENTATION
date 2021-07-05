@@ -40,9 +40,9 @@ import static java.lang.Math.*;
  *              1.1	14 Oct 2013
  * 				- moved contratAdjust -> Conv
  * 				- changed brightness adjustment factor to sigma^2		
- * 				1.1 	18 Jul 2013
+ * 				1.1 18 Jul 2013
  * 				- refactoring
- * 				1.0		05 Feb 2013 
+ * 				1.0	05 Feb 2013 
  * 				Based on Mexican_Hat_Filter v 2.2
  * 				- common functionality is refactored in a library class
  * 				
@@ -52,7 +52,7 @@ import static java.lang.Math.*;
  *
  *
  * @contents
- * This pluign convolves an image with a Mexican Hat (Laplacian of Gaussian, LoG) filter
+ * This plugin convolves an image with a Mexican Hat (Laplacian of Gaussian, LoG) filter
  * 
  * 
  * @license This library is free software; you can redistribute it and/or
@@ -115,9 +115,18 @@ public class LoG_Filter_ implements ExtendedPlugInFilter, DialogListener, IFilte
 	/** The pretty name of the target detector. */
 	//private  String FILTER_NAME = "Laplacian of Gaussian";
 
-	private Map< String, String > settings= new HashMap<String, String>();
+	private Map< String, String > settings= new HashMap<>();
 	
 	private boolean isEnabled=true;
+	
+	
+	@Override
+	public String helpInfo() {
+		return "s=sigma^2 - scale; \r\n "
+				+ "normalized - scale by sigma; \r\n "
+				+ "separable - keep enabled for faster run;";
+	}
+	
 	
 	/**
 	 * 
@@ -257,6 +266,7 @@ public class LoG_Filter_ implements ExtendedPlugInFilter, DialogListener, IFilte
 	/* (non-Javadoc)
 	 * @see ij.gui.DialogListener#dialogItemChanged(ij.gui.GenericDialog, java.awt.AWTEvent)
 	 */
+	@Override
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		sz = (int)(gd.getNextNumber());
 		debug = gd.getNextBoolean();
@@ -343,10 +353,13 @@ public class LoG_Filter_ implements ExtendedPlugInFilter, DialogListener, IFilte
 		this.isEnabled= isEnabled;
 	}
 
-	
+	/*
+	 * testing method
+	 */
 	public static void main (String[] args) {
 		LoG_Filter_ filter=new LoG_Filter_();
-		filter.getAnotatedFileds();
+		System.out.println("annotated fields");
+		System.out.println(filter.getAnotatedFileds());
 	}
 
 
@@ -361,5 +374,6 @@ public class LoG_Filter_ implements ExtendedPlugInFilter, DialogListener, IFilte
 		}
 		return data;
 	}
+
 
 }

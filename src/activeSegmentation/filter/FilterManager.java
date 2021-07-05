@@ -50,7 +50,7 @@ import java.util.zip.ZipInputStream;
  */
 public class FilterManager extends URLClassLoader implements IFilterManager {
 
-	private Map<String, IFilter> filterMap= new HashMap<String, IFilter>();
+	private Map<String, IFilter> filterMap= new HashMap<>();
 
 
 
@@ -59,6 +59,7 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 
 	private ProjectType projectType;
 
+	// what is the use?
 	private FeatureManager  featureManager;
 
 	public FilterManager(ProjectManager projectManager, FeatureManager  featureManager){
@@ -88,13 +89,14 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 	}
 
 
+	@Override
 	public  void loadFilters(List<String> plugins) throws InstantiationException, IllegalAccessException, 
 	IOException, ClassNotFoundException {
 
 		//System.out.println("home: "+home);
 		//File f=new File(home);
 		//String[] plugins = f.list();
-		List<String> classes=new ArrayList<String>();
+		List<String> classes=new ArrayList<>();
 		String cp=System.getProperty("java.class.path");
 		for(String plugin: plugins){
 			if(plugin.endsWith(ASCommon.JAR))	{ 
@@ -156,7 +158,7 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 
 	}
 
-	private void addJar(File f) throws IOException {
+	private void addJar(File f) {
 		if (f.getName().endsWith(".jar")) {
 			try {
 				addURL(f.toURI().toURL());
@@ -167,7 +169,7 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 	}
 
 	private List<String> loadImages(String directory){
-		List<String> imageList= new ArrayList<String>();
+		List<String> imageList= new ArrayList<>();
 		File folder = new File(directory);
 		File[] images = folder.listFiles();
 		for (File file : images) {
@@ -178,13 +180,14 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 		return imageList;
 	}
 
+	@Override
 	public void applyFilters(){
-		String projectString=this.projectInfo.getProjectDirectory().get(ASCommon.IMAGESDIR);
-		String filterString=this.projectInfo.getProjectDirectory().get(ASCommon.FILTERSDIR);
+		String projectString=this.projectInfo.getProjectDirectory().get(ASCommon.K_IMAGESDIR);
+		String filterString=this.projectInfo.getProjectDirectory().get(ASCommon.K_FILTERSDIR);
 
 		Map<String,List<Pair<String,double[]>>> featureList= new HashMap<>();
 		List<String>images= loadImages(projectString);
-		Map<String,Set<String>> features= new HashMap<String,Set<String>>();
+		Map<String,Set<String>> features= new HashMap<>();
 
 		for(IFilter filter: filterMap.values()){
 			//System.out.println("filter applied"+filter.getName());
@@ -208,27 +211,25 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 	}
 
 
+	@Override
 	public Set<String> getAllFilters(){
-
-
 		return filterMap.keySet();
 	}
 
 
+	@Override
 	public Map<String,String> getDefaultFilterSettings(String key){
-
 		return filterMap.get(key).getDefaultSettings();
 	}
 
 
+	@Override
 	public boolean isFilterEnabled(String key){
-
-
-
 		return filterMap.get(key).isEnabled();
 	}
 
 
+	@Override
 	public boolean updateFilterSettings(String key, Map<String,String> settingsMap){
 		return filterMap.get(key).updateSettings(settingsMap);
 	}
@@ -236,7 +237,7 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 
 
 	private  List<String> installJarPlugins(String plugin) throws IOException {
-		List<String> classNames = new ArrayList<String>();
+		List<String> classNames = new ArrayList<>();
 		ZipInputStream zip = new ZipInputStream(new FileInputStream(plugin));
 		for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
 			if (!entry.isDirectory() && entry.getName().endsWith(ASCommon.DOTCLASS)) {
@@ -273,9 +274,9 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 	public void saveFiltersMetaData(){	
 		projectInfo= projectManager.getMetaInfo();
 		//System.out.println("meta Info"+projectInfo.toString());
-		List<Map<String,String>> filterObj= new ArrayList<Map<String,String>>();
+		List<Map<String,String>> filterObj= new ArrayList<>();
 		for(String key: getAllFilters()){
-			Map<String,String> filters = new HashMap<String,String>();
+			Map<String,String> filters = new HashMap<>();
 			Map<String,String> filtersetting =getDefaultFilterSettings(key);
 			filters.put(ASCommon.FILTER, key);
 			for(String setting: filtersetting.keySet()){
@@ -309,10 +310,11 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 				IJ.log("error reading settings " +filterName);
 			}
 			try {
+				IFilter instance=getInstance(filterName);
 				if (filter.get("enabled").equalsIgnoreCase("true"))
-					filterMap.get(filterName).setEnabled(true);
+					instance.setEnabled(true);
 				else
-					filterMap.get(filterName).setEnabled(false);
+					instance.setEnabled(false);
 			} catch (RuntimeException e) {
 				IJ.log("error enabling " +filterName);
 				e.printStackTrace();
@@ -323,7 +325,7 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 
 	@Override
 	public Image getFilterImage(String key) {
-		IFilter filter=filterMap.get(key);
+		IFilter filter=getInstance(key);
 		try {
 			return ((IFilterViz) filter).getImage();
 		} catch (Exception e) {
@@ -331,5 +333,11 @@ public class FilterManager extends URLClassLoader implements IFilterManager {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+
+	@Override
+	public IFilter getInstance(String key) {
+		return filterMap.get(key);
 	}
 }
